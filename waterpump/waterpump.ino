@@ -29,8 +29,9 @@ double longitude = 110.35;
 void setup() {
   Serial.begin(9600);
   gpsSerial.begin(9600);
-
- 
+  pinMode(PUMP1_PIN, OUTPUT);
+  pinMode(PUMP2_PIN, OUTPUT);
+  pinMode(PUMP3_PIN, OUTPUT);
 }
 
 void updateMoistureData() {
