@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LDR Threshold Configuration</title>
+</head>
+<body>
+    <h1>LDR Threshold Configuration</h1>
+    <form action="/threshold" method="POST">
+        <label for="ldr">LDR:</label>
+        <select name="ldr" id="ldr">
+            <option value="LDR1">LDR 1</option>
+            <option value="LDR2">LDR 2</option>
+            <option value="LDR3">LDR 3</option>
+        </select>
+        <br><br>
+        <label for="threshold">Threshold:</label>
+        <input type="text" name="threshold" id="threshold">
+        <br><br>
+        <input type="submit" value="Set Threshold">
+    </form>
+</body>
+</html>
