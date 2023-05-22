@@ -142,8 +142,8 @@ def read_from_port():
         print("Error:")
         print(e)
         pass
-#thread = threading.Thread(target=read_from_port)
-#thread.start()
+thread = threading.Thread(target=read_from_port)
+thread.start()
 
 
 
@@ -199,7 +199,12 @@ def get_weather_data():
 
 
 def publish_data():
-    get_weather_data()
+    try:
+        get_weather_data()
+    except Exception as e:
+        print("Error:")
+        print(e)
+        
     # Custom JSON encoder to handle Decimal and datetime objects
     class CustomJSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -257,7 +262,7 @@ def publish_data():
 
         elif criteria['type'] == 'limit':
             # Query the table for the first N rows
-            query = f"SELECT * FROM {table} LIMIT {criteria['limit']}"
+            query = f"SELECT * FROM {table}  ORDER BY timestamp DESC LIMIT {criteria['limit']}"
             cursor.execute(query)
             table_data = cursor.fetchall()
             mydb.commit()
@@ -279,6 +284,7 @@ def publish_data():
 
 # setting callbacks for different events to see if it works, print the message etc.
 def on_connect(client, userdata, flags, rc, properties=None):
+    client.subscribe("nodes/water", qos=1)
     print("CONNACK received with code %s." % rc)
 
 # with this callback you can see if your publish was successful
@@ -293,7 +299,7 @@ def on_subscribe(client, userdata, mid, granted_qos, properties=None):
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     message = str(msg.payload.decode("utf-8"))
-    topic = str(msg.topic.decode("utf-8"))
+    topic = str(msg.topic)
     if (message == "refresh" and topic == "nodes/water"):
         publish_data()
         
@@ -317,8 +323,8 @@ client.on_message = on_message
 client.on_publish = on_publish
 
 # subscribe to all topics of encyclopedia by using the wildcard "#"
-client.subscribe("nodes/water", qos=1)
-publish_data()
+
+#publish_data()
 
 # loop_forever for simplicity, here you need to stop the loop manually
 # you can also use loop_start and loop_stop
