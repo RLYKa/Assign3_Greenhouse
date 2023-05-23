@@ -78,6 +78,12 @@ void readMoisture() {
   Serial.println(moisture2_level);
   Serial.print("Moisture 3: ");
   Serial.println(moisture3_level);
+  Serial.print("Thres 1: ");
+  Serial.println(thres1);
+  Serial.print("Thres 2: ");
+  Serial.println(thres2);
+  Serial.print("Thres 3: ");
+  Serial.println(thres3);
 
   if (moisture1_level > thres1 && Pump1_Pause == 0) {
     pumpWater(1);
