@@ -402,7 +402,7 @@ def insert_data():
     return jsonify({'status': 'success', 'message': ''})
 
 # Display data on web page
-@app.route('/')
+@app.route('/plot1')
 def show_data():
     try:
         cursor = mydb.cursor(dictionary=True)
