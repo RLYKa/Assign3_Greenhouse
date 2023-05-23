@@ -159,7 +159,7 @@ def plot1_moisture_data():
 
     # Prepare the chart data
     chart_data = {
-        'labels': [data[1] for data in moisture_data],
+        'labels': [data[1] for data in reversed(moisture_data)],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
             {'label': 'Moisture Level', 'data': percentage_data}
@@ -193,7 +193,7 @@ def plot2_moisture_data():
 
     # Prepare the chart data
     chart_data = {
-        'labels': [data[1] for data in moisture_data],
+        'labels': [data[1] for data in reversed(moisture_data)],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
             {'label': 'Moisture Level', 'data': percentage_data}
@@ -228,7 +228,7 @@ def plot3_moisture_data():
 
     # Prepare the chart data
     chart_data = {
-        'labels': [data[1] for data in moisture_data],
+        'labels': [data[1] for data in reversed(moisture_data)],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
             {'label': 'Moisture Level', 'data': percentage_data}
@@ -254,7 +254,7 @@ def plot1_pump_data():
         }]
     }
 
-    for row in rows:
+    for row in reversed(rows):
         date, daily_ml = row
         data['labels'].append(date)
         data['datasets'][0]['data'].append(daily_ml)
@@ -278,7 +278,7 @@ def plot2_pump_data():
         }]
     }
 
-    for row in rows:
+    for row in reversed(rows):
         date, daily_ml = row
         data['labels'].append(date)
         data['datasets'][0]['data'].append(daily_ml)
@@ -302,7 +302,7 @@ def plot3_pump_data():
         }]
     }
 
-    for row in rows:
+    for row in reversed(rows):
         date, daily_ml = row
         data['labels'].append(date)
         data['datasets'][0]['data'].append(daily_ml)

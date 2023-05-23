@@ -279,9 +279,14 @@ def publish_data():
     client.publish("nodes/water", json_data, qos=1)
 
 
+def pump_pause(x):
 
+def pump_resume(x):
 
-
+def pump_thres(pump, thres):
+    
+def pump_trigger(x):
+    
 # setting callbacks for different events to see if it works, print the message etc.
 def on_connect(client, userdata, flags, rc, properties=None):
     client.subscribe("nodes/water", qos=1)
@@ -302,8 +307,39 @@ def on_message(client, userdata, msg):
     topic = str(msg.topic)
     if (message == "refresh" and topic == "nodes/water"):
         publish_data()
+    elif (message == "Pump1_Pause = 1" and topic == "nodes/water"):
+        pump_pause(1)    
+    elif (message == "Pump2_Pause = 1" and topic == "nodes/water"):
+        pump_pause(2)
+    elif (message == "Pump3_Pause = 1" and topic == "nodes/water"):
+        pump_pause(3)
+    elif (message == "Pump1_Pause = 0" and topic == "nodes/water"):
+        pump_resume(1)    
+    elif (message == "Pump2_Pause = 0" and topic == "nodes/water"):
+        pump_resume(2)
+    elif (message == "Pump3_Pause = 0" and topic == "nodes/water"):
+        pump_resume(3)
+    elif (message == "PumpTrigger = 1" and topic == "nodes/water"):
+        pump_trigger(1)
+    elif (message == "PumpTrigger = 2" and topic == "nodes/water"):
+        pump_trigger(2)
+    elif (message == "PumpTrigger = 3" and topic == "nodes/water"):
+        pump_trigger(3)
+    elif (message == "PumpTrigger = 3" and topic == "nodes/water"):
+        pump_trigger(3)
+    elif (message.startswith("thres1 = ") and topic == "nodes/water"):
+        substring = "thres1 = "
+        thres = message.replace(substring, "")
+        pump_thres(1, thres)
+    elif (message.startswith("thres2 = ") and topic == "nodes/water"):
+        substring = "thres2 = "
+        thres = message.replace(substring, "")
+        pump_thres(2, thres)
+    elif (message.startswith("thres3 = ") and topic == "nodes/water"):
+        substring = "thres3 = "
+        thres = message.replace(substring, "")
+        pump_thres(3, thres)    
         
-
 # using MQTT version 5 here, for 3.1.1: MQTTv311, 3.1: MQTTv31
 # userdata is user defined data of any type, updated by user_data_set()
 # client_id is the given name of the client
