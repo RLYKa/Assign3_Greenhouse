@@ -57,7 +57,7 @@
 <script>
   // Fetch data from API
  // Fetch data from API
-fetch('/TempDataVisualization')
+fetch('/temp_data1')
     .then(response => response.json())
     .then(data => {
         // Process data and create chart
@@ -73,6 +73,7 @@ fetch('/TempDataVisualization')
             temperatures.push(data.tempA[i].temperature);
             humidities.push(data.tempA[i].humidity);
             checklist.push(data.tempA[i].checklist);
+            console.log(data);
         }
         var ctx = document.getElementById('myChart').getContext('2d');
         var chart = new Chart(ctx, {
