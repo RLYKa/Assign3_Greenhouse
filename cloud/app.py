@@ -139,6 +139,17 @@ def WaterDataVisualization():
 def TempDataVisualization():
     return render_template('data_temp.html')
 
+@app.route('/plot1')
+def plot1():
+    return render_template('plot1.html')
+
+@app.route('/plot2')
+def plot2():
+    return render_template('plot2.html')
+
+@app.route('/plot3')
+def plot3():
+    return render_template('plot3.html')
 
 @app.route('/publish', methods=['POST'])
 def publish_message():
