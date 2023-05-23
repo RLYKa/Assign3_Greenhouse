@@ -159,7 +159,7 @@ def plot1_moisture_data():
 
     # Prepare the chart data
     chart_data = {
-        'labels': [data[1] for data in moisture_data],
+        'labels': [data[1] for data in reversed(moisture_data)],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
             {'label': 'Moisture Level', 'data': percentage_data}
@@ -193,7 +193,7 @@ def plot2_moisture_data():
 
     # Prepare the chart data
     chart_data = {
-        'labels': [data[1] for data in moisture_data],
+        'labels': [data[1] for data in reversed(moisture_data)],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
             {'label': 'Moisture Level', 'data': percentage_data}
@@ -228,7 +228,7 @@ def plot3_moisture_data():
 
     # Prepare the chart data
     chart_data = {
-        'labels': [data[1] for data in moisture_data],
+        'labels': [data[1] for data in reversed(moisture_data)],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
             {'label': 'Moisture Level', 'data': percentage_data}
@@ -254,7 +254,7 @@ def plot1_pump_data():
         }]
     }
 
-    for row in rows:
+    for row in reversed(rows):
         date, daily_ml = row
         data['labels'].append(date)
         data['datasets'][0]['data'].append(daily_ml)
@@ -278,7 +278,7 @@ def plot2_pump_data():
         }]
     }
 
-    for row in rows:
+    for row in reversed(rows):
         date, daily_ml = row
         data['labels'].append(date)
         data['datasets'][0]['data'].append(daily_ml)
@@ -302,7 +302,7 @@ def plot3_pump_data():
         }]
     }
 
-    for row in rows:
+    for row in reversed(rows):
         date, daily_ml = row
         data['labels'].append(date)
         data['datasets'][0]['data'].append(daily_ml)
@@ -351,6 +351,110 @@ def publish_message():
     "moistureLog3": [[339, "2023-05-18T14:41:02"], [339, "2023-05-18T14:41:07"], [338, "2023-05-18T14:41:13"], [337, "2023-05-18T14:41:19"], [337, "2023-05-18T14:41:25"]]
 }
 '''
+#Gordon Part (air Cond)
+#This is for the data visualization
+@app.route('/get-data')
+def get_data():
+    try:
+        cursor = mydb.cursor(dictonary=True)
+        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+        tempAs = cursor.fetcall()
+    except my.sql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempAs = []
+
+    #Return the lastest data and warning flag as a JSON object
+    return jsonify({'tempA': tempAs})
+
+#Read data from serial port and insert into database
+#This is plot 1
+@app.route('/insert-data')
+def insert_data():
+    try:
+        temperature = float(ser.readline().strip().decode('utf-8'))
+        humidity = float(ser.readline().strip().decode('utf-8'))
+        #Publish temperature adn humidity values as MQTT messages
+        th = {
+            "temp": temperature,
+            "humd": humidity
+        }
+        mqtt_client.publish("topic/th", json.dumps(th))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+    except UnicodeDecodeError as e:
+        print(f"Error decoding data: {e}")
+        return jsonify({'status': 'error', 'message': 'Error decoding data'})
+    
+    cursor = mydb.cursor(dictionary=True)
+    sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
+    val = (temperature, humidity)
+    cursor.execute(sql, val)
+    mydb.commit
+
+    cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+    tempA = cursor.fetchall()
+    return jsonify({'status': 'success', 'message': ''})
+
+# Display data on web page
+@app.route('/')
+def show_data():
+    try:
+        cursor = mydb.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+        tempA = cursor.fetchall()
+    except my.sql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempA = []
+              
+    #Check temperature and huminity
+    warning = False
+    for tempA in tempA:
+        if tempA['temperature'] > 40 or tempA['humidity'] > 90:
+            warning = True
+            break
+        
+    return render_template('index6.html', tempA=tempA, warning=warning)
+
+@app.route('/redirect-page2')
+def redirect_page2():
+    try:
+        temperature = float(ser.readline().strip().decode('utf-8'))
+        humidity = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+    except UnicodeDecodeError as e:
+        print(f"Error decoding data: {e}")
+        return jsonify({'status': 'error', 'message': 'Error decoding data'})
+
+    return render_template('data_visual.html', temperature=temperature, humidity=humidity)
+
+#udpate button for checklist
+@app.route('/update_checklist', methods=['POST'])
+def update_checklist():
+    new_value = float(request.form.get('new_value'))
+    
+    cursor = mydb.cursor()
+    
+    cursor.execute("UPDATE tempA SET checklist = %s", (new_value,))
+    
+    mydb.commit()
+    cursor.close()
+    message = "Checklist updated successfully"
+    #return "Checklist updated successfully"
+    return render_template('index6.html', message=message)
+
 
 #read_water_node_json(json_data)
 
@@ -362,7 +466,8 @@ def publish_message():
 
 
 # Start the MQTT client loop in a separate thread
-mqtt_client.loop_start()
+
 
 if __name__ == '__main__':
+    mqtt_client.loop_forever()    
     app.run(host='0.0.0.0', port=8080)
