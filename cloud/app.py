@@ -402,7 +402,7 @@ def insert_data():
     return jsonify({'status': 'success', 'message': ''})
 
 # Display data on web page
-@app.route('/')
+@app.route('/plot1')
 def show_data():
     try:
         cursor = mydb.cursor(dictionary=True)
@@ -419,9 +419,9 @@ def show_data():
             warning = True
             break
         
-    return render_template('index6.html', tempA=tempA, warning=warning)
+    return render_template('plot1.html', tempA=tempA, warning=warning)
 
-@app.route('/redirect-page2')
+@app.route('/TempDataVisualization')
 def redirect_page2():
     try:
         temperature = float(ser.readline().strip().decode('utf-8'))
@@ -438,7 +438,7 @@ def redirect_page2():
         print(f"Error decoding data: {e}")
         return jsonify({'status': 'error', 'message': 'Error decoding data'})
 
-    return render_template('data_visual.html', temperature=temperature, humidity=humidity)
+    return render_template('data_temp.html', temperature=temperature, humidity=humidity)
 
 #udpate button for checklist
 @app.route('/update_checklist', methods=['POST'])
@@ -453,7 +453,7 @@ def update_checklist():
     cursor.close()
     message = "Checklist updated successfully"
     #return "Checklist updated successfully"
-    return render_template('index6.html', message=message)
+    return render_template('plot1.html', message=message)
 
 
 #read_water_node_json(json_data)
