@@ -13,7 +13,6 @@ TOPIC_LED_CONTROL = "nodes/ledControl"
 TOPIC_THRESHOLD = "nodes/threshold"
 TOPIC_STATUS = "nodes/status"
 TOPIC_LDR = "nodes/ldr"
-TOPIC_REQUEST_STATUS = "nodes/requestStatus"
 
 # Edge (Raspberry Pi) configuration
 edge_host = "localhost"
@@ -42,7 +41,6 @@ def on_connect(client, userdata, flags, rc):
     print(f"Connected: {rc}")
     client.subscribe(TOPIC_LED_CONTROL)
     client.subscribe(TOPIC_THRESHOLD)
-    client.subscribe(TOPIC_REQUEST_STATUS)
     client.subscribe(TOPIC_STATUS)
     client.subscribe(TOPIC_LDR)
     print("CONNACK received with code %s." % rc)
@@ -53,9 +51,8 @@ def on_message(client, userdata, msg):
         ser.write(msg.payload)
     elif msg.topic == TOPIC_THRESHOLD:
         ser.write(msg.payload)
-    elif msg.topic == TOPIC_REQUEST_STATUS:
-        if msg.payload.decode() == "getStatus":
-            ser.write(b"getStatus\n")
+    elif msg.topic == TOPIC_STATUS:
+        ser.write(b"getStatus\n")
 
 # MQTT Setup
 mqtt_client = mqtt.Client()
@@ -67,12 +64,8 @@ mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(BROKER, 8883, 60)
 
-# Flag to control LDR and status publishing
-send_ldr_status = False
-
 # Function for reading LDR values and status
 def read_ldr_status():
-    global send_ldr_status
     while True:
         if ser.in_waiting > 0:
             line = ser.readline().decode('utf-8').strip()
@@ -87,6 +80,5 @@ def read_ldr_status():
 ldr_thread = threading.Thread(target=read_ldr_status)
 ldr_thread.start()
 
-# MQTT loop
-while True:
-    mqtt_client.loop(0.1)
+# Start the MQTT loop in the main thread
+mqtt_client.loop_forever()
