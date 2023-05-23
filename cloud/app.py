@@ -331,7 +331,8 @@ def WaterDataVisualization():
 def TempDataVisualization():
     try:
         cursor = mydb.cursor()
-        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+        query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10"
+        cursor.execute(query)
         tempAs = cursor.fetchall()
     except my.sql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
@@ -342,7 +343,8 @@ def TempDataVisualization():
 @app.route('/data-visualization')
 def datavisualization():
     cursor = mydb.cursor()
-    cursor.execute("SELECT temperature, humidity, date_created FROM tempA ORDER BY date_created DESC LIMIT 10")
+    query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10"
+    cursor.execute(query)
     tempAs = cursor.fetchall()
 
     data = {
@@ -363,7 +365,7 @@ def datavisualization():
         data['labels'].append(date_created)
         data['datasets'][0]['data'].append(temperature)
         data['datasets'][0]['data'].append(humidity)
-        
+
     return jsonify(data)
         
 

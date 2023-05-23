@@ -59,7 +59,7 @@
     .then(response => response.json())
     .then(data => {
         // Process data and create chart
-        var ctx = document.getElementById('myChart1').getContext('2d');
+        var ctx = document.getElementById('myChart').getContext('2d');
         myChart1 = new Chart(ctx, {
             type: 'line',
             data: data
