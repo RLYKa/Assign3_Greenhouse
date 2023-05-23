@@ -333,18 +333,20 @@ def gay():
     
 
 @app.route('/temp_data1')
-def TempDataVisualization():
+def getTemp_Data():
     try:
         cursor = mydb.cursor()
         query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10"
         cursor.execute(query)
         tempAs = cursor.fetchall()
-    except my.sql.connector.Error as error:
+    except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
         tempAs = []
         return jsonify({'status' : 'error', 'message': 'Error decoding data'})
-    #return render_template('data_temp.html', tempAs=jsonify(tempAs))
+
     return jsonify({'tempA' : tempAs})
+
+    #return render_template('data_temp.html', tempAs=jsonify(tempAs))
 
 @app.route('/data-visualization')
 def datavisualization():
