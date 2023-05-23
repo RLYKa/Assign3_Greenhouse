@@ -341,14 +341,32 @@ def TempDataVisualization():
 
 @app.route('/data-visualization')
 def datavisualization():
-    try:
-        cursor = mydb.cursor()
-        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
-        tempAs = cursor.fetchall()
-    except UnicodeDecodeError as e:
-        print(f"Error decoding data: {e}")
+    cursor = mydb.cursor()
+    cursor.execute("SELECT temperature, humidity, date_created FROM tempA ORDER BY date_created DESC LIMIT 10")
+    tempAs = cursor.fetchall()
 
-    return json.dumps(tempAs)
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Temperature',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)',
+        }, {
+            'label': 'Humidity',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)',
+        }]
+    }
+
+    for row in reversed(tempAs):
+        temperature, humidity, date_created = row
+        data['labels'].append(date_created)
+        data['datasets'][0]['data'].append(temperature)
+        data['datasets'][0]['data'].append(humidity)
+        
+    return jsonify(data)
+        
+
 
 @app.route('/plot1')
 def plot1():

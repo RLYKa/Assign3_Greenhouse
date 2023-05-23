@@ -56,59 +56,18 @@
 <script>
   // Fetch data from API
   fetch('/data-visualization')
-      .then(response => response.json())
-      .then(data => {
-          // Process data and create chart
-          var labels = [];
-          var temperatures = [];
-          var humidities = [];
-          var checklist =[];
-          for (var i = 0; i < data.tempA.length; i++) {
-              labels.push(data.tempA[i].date_created);
-              temperatures.push(data.tempA[i].temperature);
-              humidities.push(data.tempA[i].humidity);
-              checklist.push(data.tempA[i].checklist);
-          }
-          var ctx = document.getElementById('myChart').getContext('2d');
-          var chart = new Chart(ctx, {
-              type: 'line',
-              data: {
-                  labels: labels,
-                  datasets: [{
-                      label: 'Temperature',
-                      data: temperatures,
-                      borderColor: 'red',
-                      fill: false
-                  }, {
-                      label: 'Humidity',
-                      data: humidities,
-                      borderColor: 'blue',
-                      fill: false
-                  }, {
-                      label: 'Checklist',
-                      data: checklist,
-                      borderColor: 'green',
-                      fill: false}]
-              },
-              options: {
-                  responsive: true,
-                  title: {
-                      display: true,
-                      text: 'Temperature and Humidity Data'
-                  },
-                  scales: {
-                      xAxes: [{
-                          type: 'time',
-                          time: {
-                              displayFormats: {
-                                  minute: 'h:mm a'
-                              }
-                          }
-                      }]
-                  }
-              }
-          });
-      });
+    .then(response => response.json())
+    .then(data => {
+        // Process data and create chart
+        var ctx = document.getElementById('myChart1').getContext('2d');
+        myChart1 = new Chart(ctx, {
+            type: 'line',
+            data: data
+        });
+    })
+    .catch(error => {
+        console.error('Error loading plot 1 moisture:', error);
+    });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
