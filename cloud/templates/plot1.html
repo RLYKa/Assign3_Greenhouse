@@ -170,12 +170,13 @@
   <!-- Water Section -->
   <div class="section">
     <h2>Water</h2>
-    <button class="btn btn-primary" id="water_pump">Pump Water</button>
-    <button class="btn btn-secondary" id="water_pause_resume">Pause</button>
+    <button class="btn btn-primary" onclick = "sendPumpAction('/TriggerPump')" id="water_pump">Pump Water Now</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/PausePump')" id="water_pause">Pause</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/ResumePump')" id="water_resume">Resume</button>
     <div class="input-group mb-3">
-      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage">
+      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Default: 26.7%)">
       <div class="input-group-append">
-        <button class="btn btn-primary" id="water_threshold_btn">Set Threshold</button>
+        <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
       </div>
     </div>
   </div>
