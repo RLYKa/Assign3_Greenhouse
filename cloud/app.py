@@ -330,7 +330,7 @@ def WaterDataVisualization():
 @app.route('/TempDataVisualization')
 def TempDataVisualization():
     try:
-        cursor = mydb.cursor(dictionary=True)
+        cursor = mydb.cursor()
         cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
         tempAs = cursor.fetchall()
     except my.sql.connector.Error as error:
