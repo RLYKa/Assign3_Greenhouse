@@ -337,8 +337,9 @@ def TempDataVisualization():
     except my.sql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
         tempAs = []
-        return render_template('data_temp.html', tempAs=tempAs)
-    return jsonify({'tempA' : tempAs})
+        return jsonify({'tempA' : tempAs})
+    return render_template('data_temp.html', tempAs=jsonify(tempAs))
+
 
 @app.route('/data-visualization')
 def datavisualization():
