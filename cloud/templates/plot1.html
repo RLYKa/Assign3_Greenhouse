@@ -3,6 +3,7 @@
 <head>
   <title>Plot 1</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -13,6 +14,23 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
+  <style>
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section h2 {
+      margin-bottom: 10px;
+    }
+    
+    .section p {
+      margin-bottom: 5px;
+    }
+    
+    .section button {
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
 <div class="container mt-5">
@@ -24,86 +42,62 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav nav nav-pills">
-  <li class="nav-item">
-    <a class="nav-link" href="/">Overview</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/plot1">Plot 1</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/plot2">Plot 2</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/plot3">Plot 3</a>
-  </li>
-  <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Data Visualization
-        </a>
-      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <a class="dropdown-item" href="/LightDataVisualization">Light</a>
-        <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
-        <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
-    </div>
-  </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/">Overview</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/plot1">Plot 1</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/plot2">Plot 2</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/plot3">Plot 3</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Data Visualization
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/LightDataVisualization">Light</a>
+            <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
+            <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
+          </div>
+        </li>
       </ul>
     </div>
   </nav>
+
+  <!-- Light Section -->
+  <div class="section">
+    <h2>Light</h2>
+    <p>Current status: {{ light_status }}</p>
+    <button class="btn btn-primary" id="light_toggle">Turn {{ light_toggle_text }}</button>
+    <p>Hours lights have been on: {{ light_hours_on }}</p>
+  </div>
+
+  <!-- Water Section -->
+  <div class="section">
+    <h2>Water</h2>
+    <button class="btn btn-primary" id="water_pump">Pump Water</button>
+    <button class="btn btn-secondary" id="water_pause_resume">Pause</button>
+    <div class="input-group mb-3">
+      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage">
+      <div class="input-group-append">
+        <button class="btn btn-primary" id="water_threshold_btn">Set Threshold</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Temperature Section -->
+  <div class="section">
+    <h2>Temperature</h2>
+    <p>Current temperature: {{ current_temperature }}</p>
+    <button class="btn btn-primary" id="fan_toggle">Turn {{ fan_toggle_text }}</button>
+  </div>
+
   <canvas id="myChart"></canvas>
 </div>
-
-  <script>
-    // Fetch data from API
-    fetch('/get-data3')
-        .then(response => response.json())
-        .then(data => {
-            // Process data and create chart
-            var labels = [];
-            var motorStatus = [];
-            var motorSpeed = [];
-            for (var i = 0; i < data.AirControlDB.length; i++) {
-                labels.push(data.AirControlDB[i].data_created);
-                motorStatus.push(data.AirControlDB[i].State);
-                motorSpeed.push(data.AirControlDB[i].Level);
-            }
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'State',
-                        data: motorStatus,
-                        borderColor: 'red',
-                        fill: false
-                    }, {
-                        label: 'Level',
-                        data: motorSpeed,
-                        borderColor: 'blue',
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Air Control Data'
-                    },
-                    scales: {
-                        xAxes: [{
-                            type: 'time',
-                            time: {
-                                displayFormats: {
-                                    minute: 'h:mm a'
-                                }
-                            }
-                        }]
-                    }
-                }
-            });
-        });
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
