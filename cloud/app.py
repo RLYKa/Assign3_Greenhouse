@@ -466,7 +466,8 @@ def update_checklist():
 
 
 # Start the MQTT client loop in a separate thread
-mqtt_client.loop_start()
+
 
 if __name__ == '__main__':
+    mqtt_client.loop_forever()    
     app.run(host='0.0.0.0', port=8080)
