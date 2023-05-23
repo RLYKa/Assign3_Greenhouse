@@ -127,6 +127,18 @@ mqtt_client.on_publish = on_publish
 def index():
     return render_template('index.html')
 
+@app.route('/LightDataVisualization')
+def LightDataVisualization():
+    return render_template('data_light.html')
+
+@app.route('/WaterDataVisualization')
+def WaterDataVisualization():
+    return render_template('data_water.html')
+
+@app.route('/TempDataVisualization')
+def TempDataVisualization():
+    return render_template('data_temp.html')
+
 
 @app.route('/publish', methods=['POST'])
 def publish_message():

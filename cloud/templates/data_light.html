@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Light Hours Chart</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/chart.min.js"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<body>
+<div class="container mt-5">
+<h1 class="mb-5">Light Data Visualization</h1>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Light Data Visualization</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		      <span class="navbar-toggler-icon"></span>
+		    </button>
+		    <div class="collapse navbar-collapse" id="navbarNav">
+		      <ul class="navbar-nav nav nav-pills">
+			<li class="nav-item">
+			  <a class="nav-link" href="/">Overview</a>
+			</li>
+			<li class="nav-item">
+			  <a class="nav-link" href="/plot1">Plot 1</a>
+			</li>
+			<li class="nav-item">
+			  <a class="nav-link" href="/plot2">Plot 2</a>
+			</li>
+			<li class="nav-item">
+			  <a class="nav-link" href="/plot3">Plot 3</a>
+			</li>
+      <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Data Visualization
+            </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/LightDataVisualization">Light</a>
+            <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
+            <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
+        </div>
+      </li>
+      </ul>
+    </div>
+  </nav>
+  <canvas id="myChart"></canvas>
+</div>
+
+  <script>
+    // Fetch data from API
+    fetch('/get-data')
+        .then(response => response.json())
+        .then(data => {
+            // Process data and create chart
+            var labels = [];
+            var temperatures = [];
+            var humidities = [];
+            for (var i = 0; i < data.devices.length; i++) {
+                labels.push(data.devices[i].date_created);
+                temperatures.push(data.devices[i].temperature);
+                humidities.push(data.devices[i].humidity);
+            }
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Temperature',
+                        data: temperatures,
+                        borderColor: 'red',
+                        fill: false
+                    }, {
+                        label: 'Humidity',
+                        data: humidities,
+                        borderColor: 'blue',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Temperature and Humidity Data'
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            time: {
+                                displayFormats: {
+                                    minute: 'h:mm a'
+                                }
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>
