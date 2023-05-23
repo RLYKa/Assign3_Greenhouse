@@ -339,6 +339,17 @@ def TempDataVisualization():
         return render_template('data_temp.html', tempAs=tempAs)
     return jsonify({'tempA' : tempAs})
 
+@app.route('/data-visualization')
+def datavisualization():
+    try:
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+        tempAs = cursor.fetchall()
+    except UnicodeDecodeError as e:
+        print(f"Error decoding data: {e}")
+
+    return json.dumps(tempAs)
+
 @app.route('/plot1')
 def plot1():
     return render_template('plot1.html')
