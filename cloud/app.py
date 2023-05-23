@@ -339,10 +339,10 @@ def TempDataVisualization():
         query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10"
         cursor.execute(query)
         tempAs = cursor.fetchall()
-    except mysql.connector.Error as error:
+    except my.sql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
         tempAs = []
-        return jsonify({'tempA' : tempAs})
+        return jsonify({'status' : 'error', 'message': 'Error decoding data'})
     #return render_template('data_temp.html', tempAs=jsonify(tempAs))
     return jsonify({'tempA' : tempAs})
 
