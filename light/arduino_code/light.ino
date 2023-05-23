@@ -1,89 +1,66 @@
-int ldr1Pin = A0;
-int ldr2Pin = A1;
-int ldr3Pin = A2;
+int ldrPins[] = {A0, A1, A2};
+int ledPins[] = {6, 5, 4};
+int ldrValues[3] = {0, 0, 0};
+int thresholds[3] = {100, 100, 100};  // default threshold values
+bool ledStates[3] = {LOW, LOW, LOW};
 
-int led1Pin = 6;
-int led2Pin = 5;
-int led3Pin = 4;
-
-int ldr1Threshold = 100;
-int ldr2Threshold = 100;
-int ldr3Threshold = 100;
-
-bool led1ForcedOn = false;
-bool led2ForcedOn = false;
-bool led3ForcedOn = false;
-unsigned long led1ForcedOnStartTime = 0;
-unsigned long led2ForcedOnStartTime = 0;
-unsigned long led3ForcedOnStartTime = 0;
-unsigned long forcedOnDuration = 5000; // Default duration of 5 seconds
+// LED control
+unsigned long ledTurnOnTimes[3] = {0, 0, 0};
+int ledDurations[3] = {0, 0, 0};
 
 void setup() {
   Serial.begin(9600);
-
-  pinMode(ldr1Pin, INPUT);
-  pinMode(ldr2Pin, INPUT);
-  pinMode(ldr3Pin, INPUT);
-  pinMode(led1Pin, OUTPUT);
-  pinMode(led2Pin, OUTPUT);
-  pinMode(led3Pin, OUTPUT);
+  for (int i = 0; i < 3; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
 }
 
 void loop() {
-  int ldr1Val = analogRead(ldr1Pin);
-  int ldr2Val = analogRead(ldr2Pin);
-  int ldr3Val = analogRead(ldr3Pin);
-
-  // Check if LDR values are below the respective thresholds
-  if (ldr1Val < ldr1Threshold || led1ForcedOn) {
-    digitalWrite(led1Pin, HIGH); // Turn on LED1
-    if (led1ForcedOn && millis() - led1ForcedOnStartTime >= forcedOnDuration) {
-      digitalWrite(led1Pin, LOW); // Turn off LED1 after the forced on duration
-      led1ForcedOn = false;
+  // Read command from Raspberry Pi
+  while (Serial.available()) {
+    String command = Serial.readStringUntil('\n');
+    if (command.substring(0, 1) == "T") {  // Change threshold
+      int index = command.substring(1, 2).toInt();
+      int newThreshold = command.substring(3).toInt();
+      thresholds[index] = newThreshold;
+    } else if (command.substring(0, 1) == "L") {  // Control LED
+      int index = command.substring(1, 2).toInt();
+      ledDurations[index] = command.substring(3).toInt();
+      ledTurnOnTimes[index] = millis();
+    } else if (command == "getStatus") {
+      for (int i = 0; i < 3; i++) {
+        Serial.print(ledStates[i]);
+        Serial.print(",");
+        Serial.print(thresholds[i]);
+        if (i < 2) Serial.print(",");
+      }
+      Serial.println();
     }
-  } else {
-    digitalWrite(led1Pin, LOW); // Turn off LED1
   }
-
-  if (ldr2Val < ldr2Threshold || led2ForcedOn) {
-    digitalWrite(led2Pin, HIGH); // Turn on LED2
-    if (led2ForcedOn && millis() - led2ForcedOnStartTime >= forcedOnDuration) {
-      digitalWrite(led2Pin, LOW); // Turn off LED2 after the forced on duration
-      led2ForcedOn = false;
-    }
-  } else {
-    digitalWrite(led2Pin, LOW); // Turn off LED2
-  }
-
-  if (ldr3Val < ldr3Threshold || led3ForcedOn) {
-    digitalWrite(led3Pin, HIGH); // Turn on LED3
-    if (led3ForcedOn && millis() - led3ForcedOnStartTime >= forcedOnDuration) {
-      digitalWrite(led3Pin, LOW); // Turn off LED3 after the forced on duration
-      led3ForcedOn = false;
-    }
-  } else {
-    digitalWrite(led3Pin, LOW); // Turn off LED3
-  }
-
-  if (Serial.available()) {
-    String message = Serial.readStringUntil('\n');
-    message.trim();
-    if (message.startsWith("LED1:ON")) {
-      digitalWrite(led1Pin, HIGH); // Turn on LED1
-      led1ForcedOn = true;
-      led1ForcedOnStartTime = millis();
-    } else if (message.startsWith("LED2:ON")) {
-      digitalWrite(led2Pin, HIGH); // Turn on LED2
-      led2ForcedOn = true;
-      led2ForcedOnStartTime = millis();
-    } else if (message.startsWith("LED3:ON")) {
-      digitalWrite(led3Pin, HIGH); // Turn on LED3
-      led3ForcedOn = true;
-      led3ForcedOnStartTime = millis();
-    } else if (message.startsWith("DURATION:")) {
-      forcedOnDuration = message.substring(9).toInt();
+  
+  // Control LEDs based on LDR values and LED control commands
+  for (int i = 0; i < 3; i++) {
+    ldrValues[i] = analogRead(ldrPins[i]);
+    Serial.print(ldrValues[i]);
+    Serial.print(",");
+    
+    // Check if LED control command is active
+    if (millis() - ledTurnOnTimes[i] <= ledDurations[i]*1000) {
+      digitalWrite(ledPins[i], HIGH);
+      ledStates[i] = HIGH;
+    } else {
+      if (ldrValues[i] > thresholds[i]) {
+        digitalWrite(ledPins[i], LOW);
+        ledStates[i] = LOW;
+      } else {
+        digitalWrite(ledPins[i], HIGH);
+        ledStates[i] = HIGH;
+      }
     }
   }
 
-  delay(100);
+  Serial.println();
+  
+  // Wait for a second
+  delay(1000);
 }
