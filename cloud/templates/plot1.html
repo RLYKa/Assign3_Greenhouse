@@ -22,53 +22,46 @@
       border-radius: 5px;
     }
     
-    .section h2 {
-      margin-bottom: 10px;
-    }
-    
-    .section p {
-      margin-bottom: 5px;
-    }
-    
-    .section button {
-      margin-right: 10px;
-    }
-  </style>
+</script>
+  
 </head>
 <body>
 <div class="container mt-5">
-<h1 class="mb-5">Plot 1</h1>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Plot 1</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav nav nav-pills">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Overview</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/plot1">Plot 1</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/plot2">Plot 2</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/plot3">Plot 3</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Data Visualization
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="/LightDataVisualization">Light</a>
-            <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
-            <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
-          </div>
-        </li>
-      </ul>
-    </div>
+  <h1 class="mb-5">Plot 1</h1>
+    {% if message %}
+      <div class="alert alert-warning">{{ message }}</div>
+    {% endif %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Plot 1</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Overview</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/plot1">Plot 1</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/plot2">Plot 2</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/plot3">Plot 3</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Data Visualization
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/LightDataVisualization">Light</a>
+              <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
+              <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
+            </div>
+          </li>
+        </ul>
+      </div>
   </nav>
 
   <!-- Light Section -->
@@ -80,14 +73,42 @@
   </div>
 
   <!-- Water Section -->
+  <script>
+      function sendPumpAction(action) {
+        fetch(action)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "success") {
+              console.log("Action successful");
+              // handle successful response
+            } else {
+              console.error("Error:", data.message);
+              // handle error response
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            // handle fetch error
+          });
+      }
+      
+      
+    function sendNewPumpThres() {
+      var NewThres = document.getElementById("water_threshold_input").value;
+      sendAction('/NewThres='+NewThres);
+      console.log('/NewThres='+NewThres);
+    }
+    
+    </script>
   <div class="section">
     <h2>Water</h2>
-    <button class="btn btn-primary" id="water_pump">Pump Water</button>
-    <button class="btn btn-secondary" id="water_pause_resume">Pause</button>
+    <button class="btn btn-primary" onclick = "sendPumpAction('/TriggerPump')" id="water_pump">Pump Water Now</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/PausePump')" id="water_pause">Pause</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/ResumePump')" id="water_resume">Resume</button>
     <div class="input-group mb-3">
-      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage">
+      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Default: 26.7%)">
       <div class="input-group-append">
-        <button class="btn btn-primary" id="water_threshold_btn">Set Threshold</button>
+        <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
       </div>
     </div>
   </div>
@@ -95,12 +116,38 @@
   <!-- Temperature Section -->
   <div class="section">
     <h2>Temperature</h2>
-    <p>Current temperature: {{ current_temperature }}</p>
-    <button class="btn btn-primary" id="fan_toggle">Turn {{ fan_toggle_text }}</button>
-  </div>
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>ID</th>
+              <th>Temperature (°C)</th>
+              <th>Humidity (%)</th>
+              <th>Date Created</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for tempA in tempA %}
+          <tr>
+              <td>{{ tempA.ID }}</td>
+              <td>{{ tempA.temperature }}</td>
+              <td>{{ tempA.humidity }}</td>
+              <td>{{ tempA.date_created }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" onclick="insertData()" id="insert-btn">Check</button>
 
-  <canvas id="myChart"></canvas>
+    <form method="POST" action="/update_checklist">
+      <div class ="form-group">
+          <label for="new_value" >Set Value:</label>
+          <input type="number" step="any" id="new_value" name="new_value" />
+          <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+  </div>
 </div>
+</body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>

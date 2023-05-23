@@ -66,93 +66,147 @@
 
 
 <script>
+    let myChart1;
+    let myChart2;
+    
     function loadPlot1Moisture() {
+        // Check if chart already exists and destroy it
+        if (myChart1) {
+            myChart1.destroy();
+        }
+    
         // Make an AJAX request to the Flask route to fetch new chart data
         fetch('/plot1_moisture_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
                 var ctx = document.getElementById('myChart1').getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart1 = new Chart(ctx, {
                     type: 'line',
                     data: data
                 });
+            })
+            .catch(error => {
+                console.error('Error loading plot 1 moisture:', error);
             });
     }
-
+    
     function loadPlot2Moisture() {
+        // Check if chart already exists and destroy it
+        if (myChart1) {
+            myChart1.destroy();
+        }
+    
         // Make an AJAX request to the Flask route to fetch new chart data
         fetch('/plot2_moisture_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
                 var ctx = document.getElementById('myChart1').getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart1 = new Chart(ctx, {
                     type: 'line',
                     data: data
                 });
+            })
+            .catch(error => {
+                console.error('Error loading plot 2 moisture:', error);
             });
     }
-
+    
     function loadPlot3Moisture() {
+        // Check if chart already exists and destroy it
+        if (myChart1) {
+            myChart1.destroy();
+        }
+    
         // Make an AJAX request to the Flask route to fetch new chart data
         fetch('/plot3_moisture_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
                 var ctx = document.getElementById('myChart1').getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart1 = new Chart(ctx, {
                     type: 'line',
                     data: data
                 });
+            })
+            .catch(error => {
+                console.error('Error loading plot 3 moisture:', error);
             });
     }
-
-    // Initial load of chart data
+    
+    // Initial load of moisture chart data
     loadPlot1Moisture();
-
+    
     function loadPlot1Pump() {
+        // Check if chart already exists and destroy it
+        if (myChart2) {
+            myChart2.destroy();
+        }
+    
         // Make an AJAX request to the Flask route to fetch new chart data
         fetch('/plot1_pump_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
                 var ctx = document.getElementById('myChart2').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'line',
+                myChart2 = new Chart(ctx, {
+                    type: 'bar',
                     data: data
                 });
+            })
+            .catch(error => {
+                console.error('Error loading plot 1 pump:', error);
             });
     }
-
+    
     function loadPlot2Pump() {
+        // Check if chart already exists and destroy it
+        if (myChart2) {
+            myChart2.destroy();
+        }
+    
         // Make an AJAX request to the Flask route to fetch new chart data
         fetch('/plot2_pump_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
                 var ctx = document.getElementById('myChart2').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'line',
+                myChart2 = new Chart(ctx, {
+                    type: 'bar',
                     data: data
                 });
+            })
+            .catch(error => {
+                console.error('Error loading plot 2 pump:', error);
             });
     }
-
+    
     function loadPlot3Pump() {
+        // Check if chart already exists and destroy it
+        if (myChart2) {
+            myChart2.destroy();
+        }
+    
         // Make an AJAX request to the Flask route to fetch new chart data
         fetch('/plot3_pump_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
                 var ctx = document.getElementById('myChart2').getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart2 = new Chart(ctx, {
                     type: 'bar',
                     data: data
                 });
+            })
+            .catch(error => {
+                console.error('Error loading plot 3 pump:', error);
             });
     }
+    
+    // Initial load of pump chart data
     loadPlot1Pump();
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
