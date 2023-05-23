@@ -46,9 +46,9 @@ def read_water_node_json(message):
           for row in table_data:
             
             if table_name.startswith("moistureLog"):
-                print(f"Inserting row: {row}")  # Debug print statement
+                #print(f"Inserting row: {row}")  # Debug print statement
                 # For moistureLog tables, insert a new row
-                query = f"INSERT INTO {table_names[table_name]} (moisture_level, timestamp) VALUES (%s, %s)"
+                query = f"INSERT IGNORE INTO {table_names[table_name]} (moisture_level, timestamp) VALUES (%s, %s)"
                 cursor.execute(query, (row[0], row[1]))
             elif table_name == "thresLog":
                 # For thresLog  tables, update the values
@@ -149,6 +149,7 @@ def publish_message():
     "moistureLog3": [[339, "2023-05-18T14:41:02"], [339, "2023-05-18T14:41:07"], [338, "2023-05-18T14:41:13"], [337, "2023-05-18T14:41:19"], [337, "2023-05-18T14:41:25"]]
 }
 '''
+
 #read_water_node_json(json_data)
 
 # def publish_data():
