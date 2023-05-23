@@ -131,6 +131,166 @@ def index():
 def LightDataVisualization():
     return render_template('data_light.html')
 
+
+# Endpoint for fetching plot 1 moisture data
+@app.route('/plot1_moisture_data')
+def plot1_moisture_data():
+    
+    cursor = mydb.cursor()
+
+    # Fetch data for plot 1 from moisture_log1 table
+    query = "SELECT moisture_level, timestamp FROM moisture_log1 ORDER BY timestamp DESC LIMIT 5"
+    cursor.execute(query)
+    moisture_data = cursor.fetchall()
+
+    # Fetch threshold value from thres_log table
+    query = "SELECT thres FROM thres_log WHERE thres_num = '1'"
+    cursor.execute(query)
+    threshold = cursor.fetchone()[0]
+
+    # Close the database connection
+    cursor.close()
+
+    # Prepare the chart data
+    chart_data = {
+        'labels': [data[1] for data in moisture_data],
+        'datasets': [
+            {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
+            {'label': 'Moisture Level', 'data': [data[0] for data in moisture_data]}
+        ]
+    }
+
+    return jsonify(chart_data)
+
+# Endpoint for fetching plot 2 moisture data
+@app.route('/plot2_moisture_data')
+def plot2_moisture_data():
+    cursor = mydb.cursor()
+
+    # Fetch data for plot 2 from moisture_log2 table
+    query = "SELECT moisture_level, timestamp FROM moisture_log2 ORDER BY timestamp DESC LIMIT 5"
+    cursor.execute(query)
+    moisture_data = cursor.fetchall()
+
+    # Fetch threshold value from thres_log table
+    query = "SELECT thres FROM thres_log WHERE thres_num = '2'"
+    cursor.execute(query)
+    threshold = cursor.fetchone()[0]
+
+    # Close the database connection
+    cursor.close()
+
+    # Prepare the chart data
+    chart_data = {
+        'labels': [data[1] for data in moisture_data],
+        'datasets': [
+            {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
+            {'label': 'Moisture Level', 'data': [data[0] for data in moisture_data]}
+        ]
+    }
+
+    return jsonify(chart_data)
+
+# Endpoint for fetching plot 3 moisture data
+@app.route('/plot3_moisture_data')
+def plot3_moisture_data():
+    cursor = mydb.cursor()
+
+    # Fetch data for plot 3 from moisture_log3 table
+    query = "SELECT moisture_level, timestamp FROM moisture_log3 ORDER BY timestamp DESC LIMIT 5"
+    cursor.execute(query)
+    moisture_data = cursor.fetchall()
+
+    # Fetch threshold value from thres_log table
+    query = "SELECT thres FROM thres_log WHERE thres_num = '3'"
+    cursor.execute(query)
+    threshold = cursor.fetchone()[0]
+
+    # Close the database connection
+    cursor.close()
+
+    # Prepare the chart data
+    chart_data = {
+        'labels': [data[1] for data in moisture_data],
+        'datasets': [
+            {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
+            {'label': 'Moisture Level', 'data': [data[0] for data in moisture_data]}
+        ]
+    }
+
+    return jsonify(chart_data)
+
+@app.route('/plot1_pump_data')
+def plot1_pump_data():
+    cursor = mydb.cursor()
+    query = "SELECT date, daily_ml FROM pump_log1 ORDER BY date DESC LIMIT 5"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Daily ML',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)'
+        }]
+    }
+
+    for row in rows:
+        date, daily_ml = row
+        data['labels'].append(date)
+        data['datasets'][0]['data'].append(daily_ml)
+
+    return jsonify(data)
+
+
+@app.route('/plot2_pump_data')
+def plot2_pump_data():
+    cursor = mydb.cursor()
+    query = "SELECT date, daily_ml FROM pump_log2 ORDER BY date DESC LIMIT 5"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Daily ML',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)'
+        }]
+    }
+
+    for row in rows:
+        date, daily_ml = row
+        data['labels'].append(date)
+        data['datasets'][0]['data'].append(daily_ml)
+
+    return jsonify(data)
+
+
+@app.route('/plot3_pump_data')
+def plot3_pump_data():
+    cursor = mydb.cursor()
+    query = "SELECT date, daily_ml FROM pump_log3 ORDER BY date DESC LIMIT 5"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Daily ML',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)'
+        }]
+    }
+
+    for row in rows:
+        date, daily_ml = row
+        data['labels'].append(date)
+        data['datasets'][0]['data'].append(daily_ml)
+
+    return jsonify(data)
+
 @app.route('/WaterDataVisualization')
 def WaterDataVisualization():
     return render_template('data_water.html')

@@ -50,29 +50,109 @@
       </ul>
     </div>
   </nav>
-  <canvas id="myChart"></canvas>
-  <button onclick="loadChartData()">Load New Data</button>
+  <h2 class="mb-3">Moisture Data</h2>
+  <button onclick="loadPlot1Moisture()">Plot 1</button>
+  <button onclick="loadPlot2Moisture()">Plot 2</button>
+  <button onclick="loadPlot3Moisture()">Plot 3</button>
+  <canvas id="myChart1"></canvas>
+
+  <h2 class="mb-3">Pump Data</h2>
+  <button onclick="loadPlot1Pump()">Plot 1</button>
+  <button onclick="loadPlot2Pump()">Plot 2</button>
+  <button onclick="loadPlot3Pump()">Plot 3</button>
+  <canvas id="myChart2"></canvas>
 </div>
 
 
 
 <script>
-    function loadChartData() {
+    function loadPlot1Moisture() {
         // Make an AJAX request to the Flask route to fetch new chart data
-        fetch('/chart_data')
+        fetch('/plot1_moisture_data')
             .then(response => response.json())
             .then(data => {
                 // Update the chart with the new data
-                var ctx = document.getElementById('myChart').getContext('2d');
+                var ctx = document.getElementById('myChart1').getContext('2d');
                 var myChart = new Chart(ctx, {
-                    type: 'bar',
+                    type: 'line',
+                    data: data
+                });
+            });
+    }
+
+    function loadPlot2Moisture() {
+        // Make an AJAX request to the Flask route to fetch new chart data
+        fetch('/plot2_moisture_data')
+            .then(response => response.json())
+            .then(data => {
+                // Update the chart with the new data
+                var ctx = document.getElementById('myChart1').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: data
+                });
+            });
+    }
+
+    function loadPlot3Moisture() {
+        // Make an AJAX request to the Flask route to fetch new chart data
+        fetch('/plot3_moisture_data')
+            .then(response => response.json())
+            .then(data => {
+                // Update the chart with the new data
+                var ctx = document.getElementById('myChart1').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
                     data: data
                 });
             });
     }
 
     // Initial load of chart data
-    loadChartData();
+    loadPlot1Moisture();
+
+    function loadPlot1Pump() {
+        // Make an AJAX request to the Flask route to fetch new chart data
+        fetch('/plot1_pump_data')
+            .then(response => response.json())
+            .then(data => {
+                // Update the chart with the new data
+                var ctx = document.getElementById('myChart2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: data
+                });
+            });
+    }
+
+    function loadPlot2Pump() {
+        // Make an AJAX request to the Flask route to fetch new chart data
+        fetch('/plot2_pump_data')
+            .then(response => response.json())
+            .then(data => {
+                // Update the chart with the new data
+                var ctx = document.getElementById('myChart2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: data
+                });
+            });
+    }
+
+    function loadPlot3Pump() {
+        // Make an AJAX request to the Flask route to fetch new chart data
+        fetch('/plot3_pump_data')
+            .then(response => response.json())
+            .then(data => {
+                // Update the chart with the new data
+                var ctx = document.getElementById('myChart2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data
+                });
+            });
+    }
+    loadPlot1Pump();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
