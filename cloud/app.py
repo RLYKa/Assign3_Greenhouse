@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
+
 import mysql.connector
 
 def read_water_node_json(message):
@@ -144,10 +145,15 @@ def plot1_moisture_data():
     moisture_data = cursor.fetchall()
 
     # Fetch threshold value from thres_log table
-    query = "SELECT thres FROM thres_log WHERE thres_num = '1'"
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '1'"
     cursor.execute(query)
     threshold = cursor.fetchone()[0]
-
+    # Calculate moisture level as a percentage
+    percentage_data = []
+    for data in moisture_data:
+        moisture_level = data[0]
+        percentage = round(((moisture_level - 1024)/-1024),2) * 100
+        percentage_data.append(percentage)
     # Close the database connection
     cursor.close()
 
@@ -156,7 +162,7 @@ def plot1_moisture_data():
         'labels': [data[1] for data in moisture_data],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
-            {'label': 'Moisture Level', 'data': [data[0] for data in moisture_data]}
+            {'label': 'Moisture Level', 'data': percentage_data}
         ]
     }
 
@@ -173,10 +179,15 @@ def plot2_moisture_data():
     moisture_data = cursor.fetchall()
 
     # Fetch threshold value from thres_log table
-    query = "SELECT thres FROM thres_log WHERE thres_num = '2'"
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '2'"
     cursor.execute(query)
     threshold = cursor.fetchone()[0]
-
+ # Calculate moisture level as a percentage
+    percentage_data = []
+    for data in moisture_data:
+        moisture_level = data[0]
+        percentage = round(((moisture_level - 1024)/-1024),2) * 100
+        percentage_data.append(percentage)
     # Close the database connection
     cursor.close()
 
@@ -185,11 +196,12 @@ def plot2_moisture_data():
         'labels': [data[1] for data in moisture_data],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
-            {'label': 'Moisture Level', 'data': [data[0] for data in moisture_data]}
+            {'label': 'Moisture Level', 'data': percentage_data}
         ]
     }
 
     return jsonify(chart_data)
+
 
 # Endpoint for fetching plot 3 moisture data
 @app.route('/plot3_moisture_data')
@@ -202,10 +214,15 @@ def plot3_moisture_data():
     moisture_data = cursor.fetchall()
 
     # Fetch threshold value from thres_log table
-    query = "SELECT thres FROM thres_log WHERE thres_num = '3'"
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '3'"
     cursor.execute(query)
     threshold = cursor.fetchone()[0]
-
+ # Calculate moisture level as a percentage
+    percentage_data = []
+    for data in moisture_data:
+        moisture_level = data[0]
+        percentage = round(((moisture_level - 1024)/-1024),2) * 100
+        percentage_data.append(percentage)
     # Close the database connection
     cursor.close()
 
@@ -214,11 +231,12 @@ def plot3_moisture_data():
         'labels': [data[1] for data in moisture_data],
         'datasets': [
             {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
-            {'label': 'Moisture Level', 'data': [data[0] for data in moisture_data]}
+            {'label': 'Moisture Level', 'data': percentage_data}
         ]
     }
 
     return jsonify(chart_data)
+
 
 @app.route('/plot1_pump_data')
 def plot1_pump_data():
