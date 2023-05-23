@@ -154,17 +154,19 @@
 				<tr>
 					<th>Plot ID</th>
 					<th>Current Light Hour</th>
+					<th>Soil Moisture (%)</th>
 					<th>Current Humidity (%)</th>
-					<th>Current Temperature</th>
+					<th>Current Temperature (Celcius)</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for device in devices %}
 				<tr>
 					<td>{{ device.id }}</td>
-					<td>{{ device.temperature }}</td>
-					<td>{{ device.humidity }}</td>
-					<td>{{ device.date_created }}</td>
+					<td>{{ device.light }}</td>
+					<td>{{ device.moisture }}</td>
+					<td>{{ device.humidity}}</td>
+					<td>{{ device.temp}}</td>
 				</tr>
 				{% endfor %}
 			</tbody>
