@@ -368,8 +368,7 @@ def datavisualization():
 
     return jsonify(data)
 
-        
-
+    
 
 @app.route('/plot1')
 def plot1():
