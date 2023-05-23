@@ -343,7 +343,7 @@ def TempDataVisualization():
 @app.route('/data-visualization')
 def datavisualization():
     cursor = mydb.cursor()
-    query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10"
+    query = "SELECT temperature, humidity, date_created FROM tempA ORDER BY date_created DESC LIMIT 10"
     cursor.execute(query)
     tempAs = cursor.fetchall()
 
@@ -364,9 +364,10 @@ def datavisualization():
         temperature, humidity, date_created = row
         data['labels'].append(date_created)
         data['datasets'][0]['data'].append(temperature)
-        data['datasets'][0]['data'].append(humidity)
+        data['datasets'][1]['data'].append(humidity)
 
     return jsonify(data)
+
         
 
 
