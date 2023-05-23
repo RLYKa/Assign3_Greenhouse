@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MQTT Control</title>
+</head>
+<body>
+    <h1>MQTT Control</h1>
+
+    <h2>Set LDR Threshold</h2>
+    <form action="/publish_threshold" method="POST">
+        <label for="ldr_num">LDR Number:</label>
+        <input type="text" id="ldr_num" name="ldr_num" required><br><br>
+        <label for="threshold">Threshold:</label>
+        <input type="text" id="threshold" name="threshold" required><br><br>
+        <input type="submit" value="Set Threshold">
+    </form>
+
+    <h2>Control LED</h2>
+    <form action="/publish_led" method="POST">
+        <label for="led_num">LED Number:</label>
+        <input type="text" id="led_num" name="led_num" required><br><br>
+        <label for="action">Action:</label>
+        <select id="action" name="action" required>
+            <option value="on">On</option>
+            <option value="off">Off</option>
+        </select><br><br>
+        <label for="duration">Duration (ms):</label>
+        <input type="text" id="duration" name="duration" required><br><br>
+        <input type="submit" value="Control LED">
+    </form>
+</body>
+</html>
