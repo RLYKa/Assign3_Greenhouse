@@ -453,7 +453,7 @@ def update_checklist():
     cursor.close()
     message = "Checklist updated successfully"
     #return "Checklist updated successfully"
-    return render_template('index6.html', message=message)
+    return render_template('plot1.html', message=message)
 
 
 #read_water_node_json(json_data)
