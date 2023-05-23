@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
+
 import mysql.connector
 
 def read_water_node_json(message):
@@ -127,6 +128,207 @@ mqtt_client.on_publish = on_publish
 def index():
     return render_template('index.html')
 
+@app.route('/LightDataVisualization')
+def LightDataVisualization():
+    return render_template('data_light.html')
+
+
+# Endpoint for fetching plot 1 moisture data
+@app.route('/plot1_moisture_data')
+def plot1_moisture_data():
+    
+    cursor = mydb.cursor()
+
+    # Fetch data for plot 1 from moisture_log1 table
+    query = "SELECT moisture_level, timestamp FROM moisture_log1 ORDER BY timestamp DESC LIMIT 5"
+    cursor.execute(query)
+    moisture_data = cursor.fetchall()
+
+    # Fetch threshold value from thres_log table
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '1'"
+    cursor.execute(query)
+    threshold = cursor.fetchone()[0]
+    # Calculate moisture level as a percentage
+    percentage_data = []
+    for data in moisture_data:
+        moisture_level = data[0]
+        percentage = round(((moisture_level - 1024)/-1024),2) * 100
+        percentage_data.append(percentage)
+    # Close the database connection
+    cursor.close()
+
+    # Prepare the chart data
+    chart_data = {
+        'labels': [data[1] for data in reversed(moisture_data)],
+        'datasets': [
+            {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
+            {'label': 'Moisture Level', 'data': percentage_data}
+        ]
+    }
+
+    return jsonify(chart_data)
+
+# Endpoint for fetching plot 2 moisture data
+@app.route('/plot2_moisture_data')
+def plot2_moisture_data():
+    cursor = mydb.cursor()
+
+    # Fetch data for plot 2 from moisture_log2 table
+    query = "SELECT moisture_level, timestamp FROM moisture_log2 ORDER BY timestamp DESC LIMIT 5"
+    cursor.execute(query)
+    moisture_data = cursor.fetchall()
+
+    # Fetch threshold value from thres_log table
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '2'"
+    cursor.execute(query)
+    threshold = cursor.fetchone()[0]
+ # Calculate moisture level as a percentage
+    percentage_data = []
+    for data in moisture_data:
+        moisture_level = data[0]
+        percentage = round(((moisture_level - 1024)/-1024),2) * 100
+        percentage_data.append(percentage)
+    # Close the database connection
+    cursor.close()
+
+    # Prepare the chart data
+    chart_data = {
+        'labels': [data[1] for data in reversed(moisture_data)],
+        'datasets': [
+            {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
+            {'label': 'Moisture Level', 'data': percentage_data}
+        ]
+    }
+
+    return jsonify(chart_data)
+
+
+# Endpoint for fetching plot 3 moisture data
+@app.route('/plot3_moisture_data')
+def plot3_moisture_data():
+    cursor = mydb.cursor()
+
+    # Fetch data for plot 3 from moisture_log3 table
+    query = "SELECT moisture_level, timestamp FROM moisture_log3 ORDER BY timestamp DESC LIMIT 5"
+    cursor.execute(query)
+    moisture_data = cursor.fetchall()
+
+    # Fetch threshold value from thres_log table
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '3'"
+    cursor.execute(query)
+    threshold = cursor.fetchone()[0]
+ # Calculate moisture level as a percentage
+    percentage_data = []
+    for data in moisture_data:
+        moisture_level = data[0]
+        percentage = round(((moisture_level - 1024)/-1024),2) * 100
+        percentage_data.append(percentage)
+    # Close the database connection
+    cursor.close()
+
+    # Prepare the chart data
+    chart_data = {
+        'labels': [data[1] for data in reversed(moisture_data)],
+        'datasets': [
+            {'label': 'Threshold', 'data': [threshold] * len(moisture_data)},
+            {'label': 'Moisture Level', 'data': percentage_data}
+        ]
+    }
+
+    return jsonify(chart_data)
+
+
+@app.route('/plot1_pump_data')
+def plot1_pump_data():
+    cursor = mydb.cursor()
+    query = "SELECT date, daily_ml FROM pump_log1 ORDER BY date DESC LIMIT 5"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Daily ML',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)'
+        }]
+    }
+
+    for row in reversed(rows):
+        date, daily_ml = row
+        data['labels'].append(date)
+        data['datasets'][0]['data'].append(daily_ml)
+
+    return jsonify(data)
+
+
+@app.route('/plot2_pump_data')
+def plot2_pump_data():
+    cursor = mydb.cursor()
+    query = "SELECT date, daily_ml FROM pump_log2 ORDER BY date DESC LIMIT 5"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Daily ML',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)'
+        }]
+    }
+
+    for row in reversed(rows):
+        date, daily_ml = row
+        data['labels'].append(date)
+        data['datasets'][0]['data'].append(daily_ml)
+
+    return jsonify(data)
+
+
+@app.route('/plot3_pump_data')
+def plot3_pump_data():
+    cursor = mydb.cursor()
+    query = "SELECT date, daily_ml FROM pump_log3 ORDER BY date DESC LIMIT 5"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    data = {
+        'labels': [],
+        'datasets': [{
+            'label': 'Daily ML',
+            'data': [],
+            'backgroundColor': 'rgba(75, 192, 192, 0.6)'
+        }]
+    }
+
+    for row in reversed(rows):
+        date, daily_ml = row
+        data['labels'].append(date)
+        data['datasets'][0]['data'].append(daily_ml)
+
+    return jsonify(data)
+
+@app.route('/WaterDataVisualization')
+def WaterDataVisualization():
+    return render_template('data_water.html')
+
+@app.route('/TempDataVisualization')
+def TempDataVisualization():
+    return render_template('data_temp.html')
+
+@app.route('/plot1')
+def plot1():
+    return render_template('plot1.html')
+
+@app.route('/plot2')
+def plot2():
+    return render_template('plot2.html')
+
+@app.route('/plot3')
+def plot3():
+    return render_template('plot3.html')
+
 
 @app.route('/publish', methods=['POST'])
 def publish_message():
@@ -149,6 +351,110 @@ def publish_message():
     "moistureLog3": [[339, "2023-05-18T14:41:02"], [339, "2023-05-18T14:41:07"], [338, "2023-05-18T14:41:13"], [337, "2023-05-18T14:41:19"], [337, "2023-05-18T14:41:25"]]
 }
 '''
+#Gordon Part (air Cond)
+#This is for the data visualization
+@app.route('/get-data')
+def get_data():
+    try:
+        cursor = mydb.cursor(dictonary=True)
+        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+        tempAs = cursor.fetcall()
+    except my.sql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempAs = []
+
+    #Return the lastest data and warning flag as a JSON object
+    return jsonify({'tempA': tempAs})
+
+#Read data from serial port and insert into database
+#This is plot 1
+@app.route('/insert-data')
+def insert_data():
+    try:
+        temperature = float(ser.readline().strip().decode('utf-8'))
+        humidity = float(ser.readline().strip().decode('utf-8'))
+        #Publish temperature adn humidity values as MQTT messages
+        th = {
+            "temp": temperature,
+            "humd": humidity
+        }
+        mqtt_client.publish("topic/th", json.dumps(th))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+    except UnicodeDecodeError as e:
+        print(f"Error decoding data: {e}")
+        return jsonify({'status': 'error', 'message': 'Error decoding data'})
+    
+    cursor = mydb.cursor(dictionary=True)
+    sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
+    val = (temperature, humidity)
+    cursor.execute(sql, val)
+    mydb.commit
+
+    cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+    tempA = cursor.fetchall()
+    return jsonify({'status': 'success', 'message': ''})
+
+# Display data on web page
+@app.route('/')
+def show_data():
+    try:
+        cursor = mydb.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10")
+        tempA = cursor.fetchall()
+    except my.sql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempA = []
+              
+    #Check temperature and huminity
+    warning = False
+    for tempA in tempA:
+        if tempA['temperature'] > 40 or tempA['humidity'] > 90:
+            warning = True
+            break
+        
+    return render_template('index6.html', tempA=tempA, warning=warning)
+
+@app.route('/redirect-page2')
+def redirect_page2():
+    try:
+        temperature = float(ser.readline().strip().decode('utf-8'))
+        humidity = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+        _ = float(ser.readline().strip().decode('utf-8'))
+    except UnicodeDecodeError as e:
+        print(f"Error decoding data: {e}")
+        return jsonify({'status': 'error', 'message': 'Error decoding data'})
+
+    return render_template('data_visual.html', temperature=temperature, humidity=humidity)
+
+#udpate button for checklist
+@app.route('/update_checklist', methods=['POST'])
+def update_checklist():
+    new_value = float(request.form.get('new_value'))
+    
+    cursor = mydb.cursor()
+    
+    cursor.execute("UPDATE tempA SET checklist = %s", (new_value,))
+    
+    mydb.commit()
+    cursor.close()
+    message = "Checklist updated successfully"
+    #return "Checklist updated successfully"
+    return render_template('index6.html', message=message)
+
 
 #read_water_node_json(json_data)
 
@@ -160,7 +466,8 @@ def publish_message():
 
 
 # Start the MQTT client loop in a separate thread
-mqtt_client.loop_start()
+
 
 if __name__ == '__main__':
+    mqtt_client.loop_forever()    
     app.run(host='0.0.0.0', port=8080)
