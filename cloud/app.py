@@ -119,7 +119,7 @@ def on_message(client, userdata, msg):
         data = json.loads(payload)
         cursor = mydb.cursor()
         sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
-        val = (data.temp, data.humd)
+        val = (data['temp'], data['humd'])
         cursor.execute(sql, val)
         mydb.commit()
     #until here
