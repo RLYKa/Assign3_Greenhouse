@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify
 import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
-import time
 import mysql.connector
 
 def read_water_node_json(message):
@@ -426,12 +425,11 @@ def datavisualization():
         data['datasets'][1]['data'].append(humidity)
     
     return jsonify(data)
-
+"""
 @app.route("/<action>", methods=['GET', 'POST']) 
 def action(action):
     if request.method == 'GET':
         print(action)
-        x = ''
         if action == 'PumpTrigger = 1' : 
             mqtt_client.publish("nodes/water", payload=action)
           
@@ -447,37 +445,71 @@ def action(action):
             new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
             action = (('thres1 = ' + str(new_thres)))
             mqtt_client.publish("nodes/water", payload=action)
-            
-        time.sleep(2)
         return jsonify({"status": "success"})
     else:
         return jsonify({"status": "error", "message": "Invalid method"})
 
 @app.route('/plot1')
 def plot1():
-    cursor = mydb.cursor()
-    query = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
-    cursor.execute(query)
-    moisture_level = cursor.fetchone()[0]
-    cursor.close()
-
-    # Apply a formula to the moisture level
-    moisture_level = (moisture_level - 1024) / -1024 * 100
-
-    cursor = mydb.cursor()
-    query = "SELECT thres FROM water_thres_log WHERE thres_num = '1'"
-    cursor.execute(query)
-    moisture_threshold = cursor.fetchone()[0]
-    cursor.close()
-
-    # Apply a formula to the moisture level
-    moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
-
-    data = {
-        "moisture_level": moisture_level,
-        "moisture_threshold": moisture_threshold,
-    }
+    print ("FFFFFFFFFFFFFFFFFFs")
+    try:
+      cursor = mydb.cursor()
+      query = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
+      cursor.execute(query)
+      moisture_level = cursor.fetchone()[0]
+      cursor.close()
+  
+      # Apply a formula to the moisture level
+      moisture_level = (moisture_level - 1024) / -1024 * 100
+      
+      cursor = mydb.cursor()
+      query = "SELECT thres FROM water_thres_log WHERE thres_num = '1' LIMIT 1"
+      cursor.execute(query)
+      moisture_threshold = cursor.fetchone()[0]
+      cursor.close()
+  
+      # Apply a formula to the moisture level
+      moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
+  
+      data = {
+          "moisture_level": moisture_level,
+          "moisture_threshold": moisture_threshold,
+      }
+      print (data)
+    except Exception as e:
+      print(e)
     return render_template('plot1.html', data=data)
+"""
+
+# Route for rendering the plot1 page
+@app.route('/plot1')
+def plot1():
+    moisture_level = 50  # Placeholder value, replace with actual value
+    moisture_threshold = 60  # Placeholder value, replace with actual value
+    
+    return render_template('plot1.html', moisture_level=moisture_level, moisture_threshold=moisture_threshold)
+
+# Route for processing pump actions
+@app.route('/pump_action', methods=['POST'])
+def pump_action():
+    action = request.form['action']
+    # Perform necessary actions based on the received action parameter
+    
+    # Placeholder response, replace with actual response data
+    response_data = {'status': 'success', 'message': 'Action successful'}
+    
+    return jsonify(response_data)
+
+# Route for processing setting new pump threshold
+@app.route('/set_threshold', methods=['POST'])
+def set_threshold():
+    new_threshold = request.form['new_threshold']
+    # Perform necessary actions to set the new threshold
+    
+    # Placeholder response, replace with actual response data
+    response_data = {'status': 'success', 'message': 'Threshold set successfully'}
+    
+    return jsonify(response_data) 
 
 @app.route('/plot2')
 def plot2():
@@ -525,4 +557,4 @@ def publish_message():
 
 if __name__ == '__main__':
     mqtt_client.loop_forever()    
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0',debug=True, port=8080)
