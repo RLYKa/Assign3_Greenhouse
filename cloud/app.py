@@ -137,10 +137,18 @@ def on_message(client, userdata, msg):
         data = json.loads(payload)
         # print("nodes/th data: " + payload)
         cursor = mydb.cursor()
-        sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
+        tableName = 'tempA'
+        if data['plot'] == '1':  
+            tableName = 'tempA'
+        elif data['plot'] == '2': 
+            tableName = 'tempB'
+        elif data['plot'] == '3': 
+            tableName = 'tempC'     
+
+        sql = "INSERT INTO " + tableName + " (temperature, humidity) VALUES (%s, %s)"
         val = (data['temp'], data['humd'])
         cursor.execute(sql, val)
-        print("Sql value: " + val)
+        print("Sql value: " + val)  
         mydb.commit()
     
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
@@ -537,7 +545,8 @@ def Aircontrol():
 def insert_data():
     status = 'success'
     try:
-        mqtt_client.publish('nodes/th/get', payload='get')
+        data = request.args['plot']
+        mqtt_client.publish('nodes/th/get', payload=data)
 
         # cursor = mydb.cursor()
         # query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
