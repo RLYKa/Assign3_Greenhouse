@@ -136,11 +136,11 @@
       <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Current: {{ moisture_threshold }})">
       <div class="input-group-append">
         <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
-         
       </div>
-      <div><p>Current Moisture Level: {{ moisture_level }}</p></div>
     </div>
+    <p>Current Moisture Level: {{ moisture_level }}</p>
   </div>
+
   <!-- Temperature Section -->
   <script>
     // Temperature section (Gordon Part)
