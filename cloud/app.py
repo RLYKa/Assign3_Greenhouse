@@ -150,6 +150,7 @@ def index():
 @app.route('/get_status', methods=['GET'])
 def get_status():
     mqtt_client.publish(TOPIC_REQUEST_STATUS, "getStatus")
+    mqtt_client.publish('nodes/water', "refresh")
     return 'OK', 200
 
 
