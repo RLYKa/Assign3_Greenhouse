@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
@@ -7,14 +7,14 @@ import mysql.connector
 import subprocess
 import time
 import threading
-'''
+
 def restart_service():
-  while True:
-    subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
-    time.sleep(5)
-thread = threading.Thread(target=restart_service)
-thread.start()
-'''
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
+        print("Service restarted successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while restarting the service:", str(e))
+
 
 def read_water_node_json(message):
   # Load JSON data
@@ -225,7 +225,51 @@ def get_status():
     mqtt_client.publish(TOPIC_REQUEST_HOUR, "getHour")
     mqtt_client.publish('nodes/water', "refresh")
 
-    return "Status update triggered", 200
+    # Fetch the latest data from node_status table
+    query_status = "SELECT * FROM node_status ORDER BY id DESC LIMIT 1"
+    cursor.execute(query_status)
+    status_data = cursor.fetchone()
+
+    # Fetch the latest data from node_hour table
+    query_hour = "SELECT * FROM node_hour ORDER BY id DESC LIMIT 1"
+    cursor.execute(query_hour)
+    hour_data = cursor.fetchone()
+
+    # Fetch the latest data from moisture_log1 table
+    query_moisture1 = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query_moisture1)
+    moisture1_data = cursor.fetchone()
+
+    # Fetch the latest data from moisture_log2 table
+    query_moisture2 = "SELECT moisture_level FROM moisture_log2 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query_moisture2)
+    moisture2_data = cursor.fetchone()
+
+    # Fetch the latest data from moisture_log3 table
+    query_moisture3 = "SELECT moisture_level FROM moisture_log3 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query_moisture3)
+    moisture3_data = cursor.fetchone()
+
+    # Prepare the response data
+    if status_data and hour_data:
+        response_data = f"{status_data[1]},{status_data[2]},{status_data[3]},{status_data[4]},{status_data[5]},{status_data[6]},{status_data[7]},{hour_data[1]},{hour_data[2]},{hour_data[3]}, {hour_data[4]}"
+        response_data += f",{moisture1_data[0] if moisture1_data else 'N/A'},{moisture2_data[0] if moisture2_data else 'N/A'},{moisture3_data[0] if moisture3_data else 'N/A'}"
+    else:
+        # If no data found, send empty values
+        response_data = "No data available"
+
+    # Create the Flask response
+    response = make_response(response_data, 200)
+
+    # Set cache-control headers to prevent caching
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+
+    time.sleep(3)
+    restart_service()
+
+    return response
 
 
 
