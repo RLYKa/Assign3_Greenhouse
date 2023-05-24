@@ -3,17 +3,12 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
 import mysql.connector
+import pytz
+from datetime import datetime
 
 import subprocess
 import time
 import threading
-
-def restart_service():
-    try:
-        subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
-        print("Service restarted successfully.")
-    except subprocess.CalledProcessError as e:
-        print("An error occurred while restarting the service:", str(e))
 
 
 def read_water_node_json(message):
@@ -161,9 +156,15 @@ def on_message(client, userdata, msg):
         led3_status = status_data[4]
         ldr3_threshold = status_data[5]
 
+        # Get the current UTC timestamp
+        utc_now = datetime.now(pytz.utc)
+
+        # Convert UTC timestamp to GMT+8
+        gmt8_now = utc_now.astimezone(pytz.timezone('Asia/Singapore'))
+
         # Insert data into node_status table
-        query = "INSERT INTO node_status (led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold) VALUES (%s, %s, %s, %s, %s, %s)"
-        values = (led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold)
+        query = "INSERT INTO node_status (timestamp, led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        values = (gmt8_now, led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold)
         cursor = mydb.cursor()
         cursor.execute(query, values)
         mydb.commit()
@@ -176,17 +177,18 @@ def on_message(client, userdata, msg):
         led2_hour = hour_data[1]
         led3_hour = hour_data[2]
 
+        # Get the current UTC timestamp
+        utc_now = datetime.now(pytz.utc)
+
+        # Convert UTC timestamp to GMT+8
+        gmt8_now = utc_now.astimezone(pytz.timezone('Asia/Singapore'))
+
         # Insert data into node_hour table
-        query = "INSERT INTO node_hour (led1_hour, led2_hour, led3_hour) VALUES (%s, %s, %s)"
-        values = (led1_hour, led2_hour, led3_hour)
+        query = "INSERT INTO node_hour (timestamp, led1_hour, led2_hour, led3_hour) VALUES (%s, %s, %s, %s)"
+        values = (gmt8_now, led1_hour, led2_hour, led3_hour)
         cursor = mydb.cursor()
         cursor.execute(query, values)
-        mydb.commit()
-
-    # Print the MQTT message
-    print("Received message:", msg.topic, msg.payload)
-
-        
+        mydb.commit()     
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_subscribe = on_subscribe
