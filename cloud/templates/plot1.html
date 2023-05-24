@@ -216,7 +216,7 @@
       <div class="form-group">
         <label for="speed">Speed</label>
         <select class="form-control" id="speed" name="speed">
-      <option value="0">Off</option>
+          <option value="0">Off</option>
           <option value="1">Low</option>
           <option value="2">Medium</option>
           <option value="3">High</option>
@@ -241,7 +241,7 @@
           xhr.send(JSON.stringify({
               value: {
                 status: $("#direction").val(),
-                speed: $("#speed")
+                speed: $("#speed").val()
               }
           }));
           console.log(xhr.status);
