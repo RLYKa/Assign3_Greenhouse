@@ -153,7 +153,9 @@
 			<thead>
 				<tr>
 					<th>Plot ID</th>
-					<th>Current Light Hour</th>
+					<th>Light Status</th>
+					<th>Current Thershold</th>
+					<th>Light Activated for (hours)</th>
 					<th>Soil Moisture (%)</th>
 					<th>Current Humidity (%)</th>
 					<th>Current Temperature (Celcius)</th>
@@ -163,7 +165,9 @@
 				{% for device in devices %}
 				<tr>
 					<td>{{ device.id }}</td>
-					<td>{{ device.light }}</td>
+					<td>{{ device.led}}</td>
+					<td>{{ device.lightThres}}</td>
+					<td>{{ device.lightHour}}</td>
 					<td>{{ device.moisture }}</td>
 					<td>{{ device.humidity}}</td>
 					<td>{{ device.temp}}</td>
@@ -173,8 +177,50 @@
 		</table>
 		<button type="button" class="btn btn-primary" onclick="insertData()" id="insert-btn">Check</button>
 	</div>
+
+	<form id="form_threshold">
+        <h2>Change LDR Threshold</h2>
+        <label for="index">LDR Index:</label>
+        <input type="number" id="index" name="index" min="0" max="2" required>
+        <label for="new_threshold">New Threshold:</label>
+        <input type="number" id="new_threshold" name="new_threshold" required>
+        <button type="submit">Change Threshold</button>
+    </form>
+
+    <form id="form_led">
+        <h2>Control LED</h2>
+        <label for="index">LED Index:</label>
+        <input type="number" id="index" name="index" min="0" max="2" required>
+        <label for="duration">Duration (seconds):</label>
+        <input type="number" id="duration" name="duration" required>
+        <button type="submit">Control LED</button>
+    </form>
+
+    <button id="get_status">Get Status</button>
+
+    <div id="status"></div>
 	
 	<!-- Link to Bootstrap JS -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	
+    <script>
+        $("#form_threshold").submit(function(e) {
+            e.preventDefault();
+            $.post("/change_threshold", $(this).serialize());
+        });
+
+        $("#form_led").submit(function(e) {
+            e.preventDefault();
+            $.post("/control_led", $(this).serialize());
+        });
+
+        $("#get_status").click(function(e) {
+            e.preventDefault();
+            $("#status").empty(); // Empty the previous status
+
+            // Request status from the edge
+            $.get("/get_status");
+        });
+    </script>
 </body>
 </html>
