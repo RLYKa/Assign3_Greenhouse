@@ -644,11 +644,65 @@ def set_threshold():
 """
 @app.route('/plot2')
 def plot2():
-    return render_template('plot2.html')
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT moisture_level FROM moisture_log2 ORDER BY timestamp DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_level = result[0]
+        cursor.close()
+    
+        # Apply a formula to the moisture level
+        moisture_level = (moisture_level - 1024) / -1024 * 100
+        print(moisture_level)
+    
+        cursor = mydb.cursor()
+        query = "SELECT thres FROM water_thres_log WHERE thres_num = '2' LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_threshold = result[0]
+        cursor.close()
+    
+        moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
+        print(moisture_threshold)
+    
+    except Exception as e:
+        print("An error occurred:", str(e))
+
+    return render_template('plot2.html', moisture_level=moisture_level, moisture_threshold=moisture_threshold)
 
 @app.route('/plot3')
 def plot3():
-    return render_template('plot3.html')
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT moisture_level FROM moisture_log3 ORDER BY timestamp DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_level = result[0]
+        cursor.close()
+    
+        # Apply a formula to the moisture level
+        moisture_level = (moisture_level - 1024) / -1024 * 100
+        print(moisture_level)
+    
+        cursor = mydb.cursor()
+        query = "SELECT thres FROM water_thres_log WHERE thres_num = '3' LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_threshold = result[0]
+        cursor.close()
+    
+        moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
+        print(moisture_threshold)
+    
+    except Exception as e:
+        print("An error occurred:", str(e))
+
+    return render_template('plot3.html', moisture_level=moisture_level, moisture_threshold=moisture_threshold)
 
 
 @app.route('/publish', methods=['POST'])
