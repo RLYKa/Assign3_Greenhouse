@@ -390,6 +390,8 @@ def plot3_pump_data():
 def WaterDataVisualization():
     return render_template('data_water.html')
 
+
+#Gordon Part
 @app.route('/TempDataVisualization')
 def gay():
   return render_template('data_temp.html')
@@ -462,7 +464,7 @@ def datavisualization():
         data['datasets'][1]['data'].append(humidity)
     
     return jsonify(data)
-
+#Gordon part until here
 
 
 
