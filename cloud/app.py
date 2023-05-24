@@ -345,7 +345,7 @@ def getTemp_Data():
     return jsonify({'tempA' : tempA})
 
 @app.route('/temp_data_plot1')
-def getTemp_Data():
+def getTemp_Data_plot1():
     try:
         cursor = mydb.cursor()
         query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 5"
