@@ -115,7 +115,7 @@ def on_message(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
     topic = msg.topic
 
-    if topic == "topic/th":
+    if topic == "nodes/th":
         data = json.loads(payload)
         cursor = mydb.cursor()
         sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
