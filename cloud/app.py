@@ -133,10 +133,12 @@ def on_message(client, userdata, msg):
 
     if topic == "nodes/th":
         data = json.loads(payload)
+        # print("nodes/th data: " + payload)
         cursor = mydb.cursor()
         sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
         val = (data['temp'], data['humd'])
         cursor.execute(sql, val)
+        print("Sql value: " + val)
         mydb.commit()
     #until here
 
