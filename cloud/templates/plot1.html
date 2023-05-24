@@ -94,11 +94,30 @@
         
       function sendNewPumpThres() {
         var NewThres = document.getElementById("water_threshold_input").value;
-        sendAction('/NewThres='+NewThres);
-        console.log('/NewThres='+NewThres);
+        sendAction('/thres1 = '+ NewThres);
+        console.log('/thres1 = '+ NewThres);
       }
       
-      // Temperature section (Gordon Part)
+      
+    </script>
+
+  <div class="section">
+    <h2>Water</h2>
+    <button class="btn btn-primary" onclick = "sendPumpAction('/PumpTrigger = 1')" id="water_pump">Pump Water Now</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump1_Pause = 1')" id="water_pause">Pause</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump1_Pause = 0')" id="water_resume">Resume</button>
+    <div class="input-group mb-3">
+      <p>Current Moisture Level: {{ moisture_level }}</p>
+      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Current: {{ moisture_threshold }})">
+      <div class="input-group-append">
+        <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Temperature Section -->
+  <script>
+    // Temperature section (Gordon Part)
           // Function to fetch latest data and update the table
         function updateTable() {
         console.log('updateTable called');
@@ -153,22 +172,8 @@
               })
               .catch(error => console.log(error));
       }
-    </script>
-
-  <div class="section">
-    <h2>Water</h2>
-    <button class="btn btn-primary" onclick = "sendPumpAction('/TriggerPump')" id="water_pump">Pump Water Now</button>
-    <button class="btn btn-secondary" onclick = "sendPumpAction('/PausePump')" id="water_pause">Pause</button>
-    <button class="btn btn-secondary" onclick = "sendPumpAction('/ResumePump')" id="water_resume">Resume</button>
-    <div class="input-group mb-3">
-      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Default: 26.7%)">
-      <div class="input-group-append">
-        <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Temperature Section -->
+  </script>
+  
   <div class="section">
     <h2>Temperature</h2>
     <table class="table table-striped">

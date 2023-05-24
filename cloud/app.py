@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
-
+import time
 import mysql.connector
 
 def read_water_node_json(message):
@@ -427,11 +427,57 @@ def datavisualization():
     
     return jsonify(data)
 
-    
+@app.route("/<action>", methods=['GET', 'POST']) 
+def action(action):
+    if request.method == 'GET':
+        print(action)
+        x = ''
+        if action == 'PumpTrigger = 1' : 
+            mqtt_client.publish("nodes/water", payload=action)
+          
+        if action == 'Pump1_Pause = 1' : 
+            mqtt_client.publish("nodes/water", payload=action)
+           
+        if action == 'Pump1_Pause = 0' : 
+            mqtt_client.publish("nodes/water", payload=action)
+          
+        if action.startswith('thres1 = '):
+            percentage = action.replace('thres1 =', '')
+            percentage = int(percentage)
+            new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
+            action = (('thres1 = ' + str(new_thres)))
+            mqtt_client.publish("nodes/water", payload=action)
+            
+        time.sleep(2)
+        return jsonify({"status": "success"})
+    else:
+        return jsonify({"status": "error", "message": "Invalid method"})
 
 @app.route('/plot1')
 def plot1():
-    return render_template('plot1.html')
+    cursor = mydb.cursor()
+    query = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query)
+    moisture_level = cursor.fetchone()[0]
+    cursor.close()
+
+    # Apply a formula to the moisture level
+    moisture_level = (moisture_level - 1024) / -1024 * 100
+
+    cursor = mydb.cursor()
+    query = "SELECT thres FROM water_thres_log WHERE thres_num = '1'"
+    cursor.execute(query)
+    moisture_threshold = cursor.fetchone()[0]
+    cursor.close()
+
+    # Apply a formula to the moisture level
+    moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
+
+    data = {
+        "moisture_level": moisture_level,
+        "moisture_threshold": moisture_threshold,
+    }
+    return render_template('plot1.html', data=data)
 
 @app.route('/plot2')
 def plot2():
