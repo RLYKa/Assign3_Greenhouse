@@ -55,9 +55,9 @@
     </div>
   </nav>
   <h2 class="mb-3">Temperature and Humidity Data</h2>
-  <button onclick="loadPlot1TH()">Plot 1</button>
-  <button onclick="loadPlot2TH()">Plot 2</button>
-  <button onclick="loadPlot3TH()">Plot 3</button>
+  <button onclick="loadPlot1TH()" class="btn btn-primary">Plot 1</button>
+  <button onclick="loadPlot2TH()" class="btn btn-primary">Plot 2</button>
+  <button onclick="loadPlot3TH()" class="btn btn-primary">Plot 3</button>
   <canvas id="myChart"></canvas>
 </div>
 
@@ -87,7 +87,7 @@
               labels.push(data.tempA[i][4]);
           }
           var ctx = document.getElementById('myChart').getContext('2d');
-           chart = new Chart(ctx, {
+          chart = new Chart(ctx, {
               type: 'line',
               data: {
                   labels: labels,
