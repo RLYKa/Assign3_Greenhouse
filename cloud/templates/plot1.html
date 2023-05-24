@@ -99,6 +99,45 @@
       }
       
       // Temperature section (Gordon Part)
+          // Function to fetch latest data and update the table
+          function updateTable() {
+        console.log('updateTable called');
+        fetch('/temp-data1')
+        .then(response=> response.json())
+        .then(data=> {
+            let table = document.querySelector('table');
+            let tbody = table.querySelector('tbody');
+            console.log(data);
+
+            // Replace the current table rows with the latest data
+            tbody.innerHTML = '';
+            data.tempA.forEach(tempA=> {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${tempA[0]}</td>
+                <td>${tempA[1]}</td>
+                <td>${tempA[2]}</td>
+                <td>${tempA[4]}</td>
+            `;
+            tbody.appendChild(tr);
+            });
+            console.log(data.tempA);
+
+            // Update the warning message if necessary
+            let warning = document.querySelector('.alert-warning');
+            if (warning) {
+            if (data.warning) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+            }
+        })
+        .catch(error => console.log(error));
+    }
+    // Call the function initially and every 10 seconds
+    updateTable();
+    setInterval(updateTable, 10000);
       function insertData() {
               fetch('/insert-data')
               .then(response => response.json())
