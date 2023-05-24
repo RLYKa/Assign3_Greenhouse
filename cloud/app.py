@@ -632,7 +632,7 @@ def insert_data():
     status = 'success'
     try:
         data = request.args['plot']
-        mqtt_client.publish('nodes/th', payload=data)
+        mqtt_client.publish('nodes/th/get', payload=data)
 
         # cursor = mydb.cursor()
         # query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
