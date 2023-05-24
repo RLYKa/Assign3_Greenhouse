@@ -205,7 +205,7 @@
       </div>
     </form>
   </br>
-    <form method="POST" action="#">
+    <form id="motor-form" method="POST" action="#">
       <div class="form-group">
         <label for="direction">Direction</label>
         <select class="form-control" id="direction" name="direction">
@@ -222,7 +222,7 @@
           <option value="3">High</option>
         </select>
       </div>
-      <button id='motor-submit' type="submit" class="btn btn-primary">Set</button>
+      <button type="submit" class="btn btn-primary">Set</button>
     </form>
   </div>
 </div>
@@ -231,8 +231,9 @@
         $("#direction").val(motorStatus);
         $("#speed").val(motorSpeed);
 
-        $("#motor-submit").click(function(e) {
+        $("#motor-form").submit(function(e) {
           e.preventDefault();
+          console.log('motor form submitted');
 
           var xhr = new XMLHttpRequest();
           xhr.open("POST", '/Aircontrol', true);
