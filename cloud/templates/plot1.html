@@ -103,8 +103,14 @@
               fetch('/insert-data')
               .then(response => response.json())
               .then(data => {
+                if (data.status === "success") {
+                  console.log("Action successful");
                   updateTable();
-                  console.log(data);
+                  // handle successful response
+                } else {
+                  console.error("Error:", data.message);
+                  // handle error response
+                }
               })
               .catch(error => console.log(error));
       }
