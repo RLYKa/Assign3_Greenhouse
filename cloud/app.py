@@ -91,6 +91,11 @@ mqtt_client.tls_set(tls_version=paho.ssl.PROTOCOL_TLSv1_2)
 
 mqtt_client.connect(broker, port)
 
+TOPIC_STATUS = 'nodes/status'
+TOPIC_THRESHOLD = 'nodes/threshold'
+TOPIC_LED = 'nodes/ledControl'
+TOPIC_REQUEST_STATUS = "nodes/requestStatus"
+
 
 # Callback functions
 def on_connect(client, userdata, flags, rc, properties=None):
@@ -141,6 +146,28 @@ mqtt_client.on_publish = on_publish
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/get_status', methods=['GET'])
+def get_status():
+    mqtt_client.publish(TOPIC_REQUEST_STATUS, "getStatus")
+    return 'OK', 200
+
+
+@app.route('/change_threshold', methods=['POST'])
+def change_threshold():
+    index = request.form.get('index')
+    new_threshold = request.form.get('new_threshold')
+    mqtt_client.publish(TOPIC_THRESHOLD, f"{index}:{new_threshold}")
+    return 'OK', 200
+
+
+@app.route('/control_led', methods=['POST'])
+def control_led():
+    index = request.form.get('index')
+    duration = request.form.get('duration')
+    mqtt_client.publish(TOPIC_LED, f"{index}:{duration}")
+    return 'OK', 200
 
 @app.route('/LightDataVisualization')
 def LightDataVisualization():
