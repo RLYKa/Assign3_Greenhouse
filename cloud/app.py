@@ -553,7 +553,7 @@ def WaterDataVisualization():
 def gay():
   return render_template('data_temp.html')
     
-
+# Plot 1 data visualization
 @app.route('/temp_data1')
 def getTemp_Data():
     try:
@@ -566,6 +566,20 @@ def getTemp_Data():
         tempA = []
     return jsonify({'tempA' : tempA})
 
+# Plot 2 data visualization
+@app.route('/temp_data2')
+def getTemp_Data2():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT * FROM tempB ORDER BY date_created DESC LIMIT 10"
+        cursor.execute(query)
+        tempB = cursor.fetchall()
+    except mysql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempB = []
+    return jsonify({'tempB' : tempB})
+
+# data table in plot 1
 @app.route('/temp_data_plot1')
 def getTemp_Data_plot1():
     try:
@@ -578,6 +592,7 @@ def getTemp_Data_plot1():
         tempA = []
     return jsonify({'tempA' : tempA})
 
+# data table in plot 1
 @app.route('/Aircontrol', methods=['POST'])
 def Aircontrol():
     data = request.form
@@ -588,7 +603,7 @@ def Aircontrol():
     time.sleep(1)
     return 'OK', 200
 
-# update the checklist
+# update the checklist in plot 1
 @app.route('/update_checklist', methods=['POST'])
 def update_checklist():
     new_value = float(request.form.get('new_value'))
@@ -600,6 +615,7 @@ def update_checklist():
     #return "Checklist updated successfully"
     return render_template('plot1.html', message=message)
 
+# inset data in the plot 1
 @app.route('/insert-data')
 def insert_data():
     status = 'success'
@@ -607,9 +623,9 @@ def insert_data():
         data = request.args['plot']
         mqtt_client.publish('nodes/th/get', payload=data)
 
-        # cursor = mydb.cursor()
-        # query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
-        # cursor.execute(query)
+        cursor = mydb.cursor()
+        query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
+        cursor.execute(query)
         status = 'success'
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
