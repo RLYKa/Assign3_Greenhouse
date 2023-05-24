@@ -623,9 +623,9 @@ def insert_data():
         data = request.args['plot']
         mqtt_client.publish('nodes/th/get', payload=data)
 
-        cursor = mydb.cursor()
-        query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
-        cursor.execute(query)
+        # cursor = mydb.cursor()
+        # query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
+        # cursor.execute(query)
         status = 'success'
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
