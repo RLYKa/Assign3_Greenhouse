@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 import paho.mqtt.client as mqtt
 import paho.mqtt.client as paho
 import json
@@ -7,14 +7,14 @@ import mysql.connector
 import subprocess
 import time
 import threading
-'''
+
 def restart_service():
-  while True:
-    subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
-    time.sleep(5)
-thread = threading.Thread(target=restart_service)
-thread.start()
-'''
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
+        print("Service restarted successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while restarting the service:", str(e))
+
 
 def read_water_node_json(message):
   # Load JSON data
@@ -106,6 +106,8 @@ TOPIC_STATUS = 'nodes/status'
 TOPIC_THRESHOLD = 'nodes/threshold'
 TOPIC_LED = 'nodes/ledControl'
 TOPIC_REQUEST_STATUS = "nodes/requestStatus"
+TOPIC_REQUEST_HOUR = "nodes/requestHour"
+TOPIC_HOUR = "nodes/hour"
 
 
 # Callback functions
@@ -127,7 +129,7 @@ def on_subscribe(client, userdata, mid, granted_qos, properties=None):
 
 
 def on_message(client, userdata, msg):
-    #Gordon Part
+    # Gordon Part
     payload = msg.payload.decode("utf-8")
     topic = msg.topic
 
@@ -140,13 +142,49 @@ def on_message(client, userdata, msg):
         cursor.execute(sql, val)
         print("Sql value: " + val)
         mydb.commit()
-    #until here
-
+    
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     message = str(msg.payload.decode("utf-8"))
     receiving_topic = str(msg.topic)
+    
     if receiving_topic == "nodes/water" and message.startswith('{"thresLog":'):
         read_water_node_json(message)
+
+    elif receiving_topic == TOPIC_STATUS:
+        # Handle status message
+        # Extract the data from the MQTT message
+        status_data = message.split(',')
+        led1_status = status_data[0]
+        ldr1_threshold = status_data[1]
+        led2_status = status_data[2]
+        ldr2_threshold = status_data[3]
+        led3_status = status_data[4]
+        ldr3_threshold = status_data[5]
+
+        # Insert data into node_status table
+        query = "INSERT INTO node_status (led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold) VALUES (%s, %s, %s, %s, %s, %s)"
+        values = (led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold)
+        cursor = mydb.cursor()
+        cursor.execute(query, values)
+        mydb.commit()
+
+    elif receiving_topic == TOPIC_HOUR:
+        # Handle hour message
+        # Extract the data from the MQTT message
+        hour_data = message.split(',')
+        led1_hour = hour_data[0]
+        led2_hour = hour_data[1]
+        led3_hour = hour_data[2]
+
+        # Insert data into node_hour table
+        query = "INSERT INTO node_hour (led1_hour, led2_hour, led3_hour) VALUES (%s, %s, %s)"
+        values = (led1_hour, led2_hour, led3_hour)
+        cursor = mydb.cursor()
+        cursor.execute(query, values)
+        mydb.commit()
+
+    # Print the MQTT message
+    print("Received message:", msg.topic, msg.payload)
 
         
 
@@ -199,13 +237,58 @@ def restart_service():
 
 @app.route('/get_status', methods=['GET'])
 def get_status():
+    cursor = mydb.cursor()
+
     mqtt_client.publish(TOPIC_REQUEST_STATUS, "getStatus")
+    mqtt_client.publish(TOPIC_REQUEST_HOUR, "getHour")
     mqtt_client.publish('nodes/water', "refresh")
+
+    # Fetch the latest data from node_status table
+    query_status = "SELECT * FROM node_status ORDER BY id DESC LIMIT 1"
+    cursor.execute(query_status)
+    status_data = cursor.fetchone()
+
+    # Fetch the latest data from node_hour table
+    query_hour = "SELECT * FROM node_hour ORDER BY id DESC LIMIT 1"
+    cursor.execute(query_hour)
+    hour_data = cursor.fetchone()
+
+    # Fetch the latest data from moisture_log1 table
+    query_moisture1 = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query_moisture1)
+    moisture1_data = cursor.fetchone()
+
+    # Fetch the latest data from moisture_log2 table
+    query_moisture2 = "SELECT moisture_level FROM moisture_log2 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query_moisture2)
+    moisture2_data = cursor.fetchone()
+
+    # Fetch the latest data from moisture_log3 table
+    query_moisture3 = "SELECT moisture_level FROM moisture_log3 ORDER BY timestamp DESC LIMIT 1"
+    cursor.execute(query_moisture3)
+    moisture3_data = cursor.fetchone()
+
+    # Prepare the response data
+    if status_data and hour_data:
+        response_data = f"{status_data[1]},{status_data[2]},{status_data[3]},{status_data[4]},{status_data[5]},{status_data[6]},{status_data[7]},{hour_data[1]},{hour_data[2]},{hour_data[3]}, {hour_data[4]}"
+        response_data += f",{moisture1_data[0] if moisture1_data else 'N/A'},{moisture2_data[0] if moisture2_data else 'N/A'},{moisture3_data[0] if moisture3_data else 'N/A'}"
+    else:
+        # If no data found, send empty values
+        response_data = "No data available"
+
+    # Create the Flask response
+    response = make_response(response_data, 200)
+
+    # Set cache-control headers to prevent caching
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+
     time.sleep(3)
     restart_service()
-    #time.sleep(1)
-    #restart_script()
-    return 'OK', 200
+
+    return response
+
 
 
 @app.route('/change_threshold', methods=['POST'])
@@ -557,7 +640,7 @@ def plot1():
         print("An error occurred:", str(e))
 
     return render_template('plot1.html', moisture_level=moisture_level, moisture_threshold=moisture_threshold)
-'''
+
 # Route for fetching the latest data for plot1
 @app.route('/get_latest_plot1_data', methods=['GET'])
 def get_latest_plot1_data():
@@ -572,7 +655,7 @@ def get_latest_plot1_data():
 
         # Apply a formula to the moisture level
         moisture_level = (moisture_level - 1024) / -1024 * 100
- 
+
         cursor = mydb.cursor()
         query = "SELECT thres FROM water_thres_log WHERE thres_num = '1' LIMIT 1"
         cursor.execute(query)
@@ -588,7 +671,7 @@ def get_latest_plot1_data():
     except Exception as e:
         print("An error occurred:", str(e))
         return jsonify({'error': 'An error occurred'})
-'''
+
 
 
     
