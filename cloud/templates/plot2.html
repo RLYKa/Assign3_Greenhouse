@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Plot 2</title>
+  <title>Plot 1</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -13,45 +14,54 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
+  <style>
+    .section {
+      margin-bottom: 30px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+  
 </head>
 <body>
 <div class="container mt-5">
-<h1 class="mb-5">Plot 2</h1>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Plot 2</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav nav nav-pills">
-  <li class="nav-item">
-    <a class="nav-link" href="/">Overview</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/plot1">Plot 1</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/plot2">Plot 2</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/plot3">Plot 3</a>
-  </li>
-  <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Data Visualization
-        </a>
-      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <a class="dropdown-item" href="/LightDataVisualization">Light</a>
-        <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
-        <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
-    </div>
-  </li>
-      </ul>
-    </div>
+  <h1 class="mb-5">Plot 1</h1>
+    {% if message %}
+      <div class="alert alert-warning">{{ message }}</div>
+    {% endif %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Plot 1</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Overview</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/plot1">Plot 1</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/plot2">Plot 2</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/plot3">Plot 3</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Data Visualization
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/LightDataVisualization">Light</a>
+              <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
+              <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
+            </div>
+          </li>
+        </ul>
+      </div>
   </nav>
-  <canvas id="myChart"></canvas>
-</div>
 
  
   <!-- Light Section -->
@@ -84,7 +94,7 @@
 
       function sendNewPumpThres() {
           var NewThres = document.getElementById("water_threshold_input").value;
-          var action = "/thres1 = " + NewThres;
+          var action = "/thres2 = " + NewThres;
           sendPumpAction(action);
           console.log(action);
       }
@@ -92,9 +102,9 @@
 
   <div class="section">
     <h2>Water</h2>
-    <button class="btn btn-primary" onclick = "sendPumpAction('/PumpTrigger = 1')" id="water_pump">Pump Water Now</button>
-    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump1_Pause = 1')" id="water_pause">Pause</button>
-    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump1_Pause = 0')" id="water_resume">Resume</button>
+    <button class="btn btn-primary" onclick = "sendPumpAction('/PumpTrigger = 2')" id="water_pump">Pump Water Now</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump2_Pause = 1')" id="water_pause">Pause</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump2_Pause = 0')" id="water_resume">Resume</button>
     <div class="input-group mb-3">
       <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Current: {{ moisture_threshold }})">
       <div class="input-group-append">
