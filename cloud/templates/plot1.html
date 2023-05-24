@@ -21,8 +21,7 @@
       padding: 10px;
       border-radius: 5px;
     }
-    
-</script>
+  </style>
   
 </head>
 <body>
@@ -74,32 +73,43 @@
 
   <!-- Water Section -->
   <script>
-      function sendPumpAction(action) {
-        fetch(action)
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === "success") {
-              console.log("Action successful");
-              // handle successful response
-            } else {
-              console.error("Error:", data.message);
-              // handle error response
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            // handle fetch error
-          });
+        function sendPumpAction(action) {
+          fetch(action)
+            .then(response => response.json())
+            .then(data => {
+              if (data.status === "success") {
+                console.log("Action successful");
+                // handle successful response
+              } else {
+                console.error("Error:", data.message);
+                // handle error response
+              }
+            })
+            .catch(error => {
+              console.error(error);
+              // handle fetch error
+            });
+        }
+        
+        
+      function sendNewPumpThres() {
+        var NewThres = document.getElementById("water_threshold_input").value;
+        sendAction('/NewThres='+NewThres);
+        console.log('/NewThres='+NewThres);
       }
       
-      
-    function sendNewPumpThres() {
-      var NewThres = document.getElementById("water_threshold_input").value;
-      sendAction('/NewThres='+NewThres);
-      console.log('/NewThres='+NewThres);
-    }
-    
+      // Temperature section (Gordon Part)
+      function insertData() {
+              fetch('/insert-data')
+              .then(response => response.json())
+              .then(data => {
+                  updateTable();
+                  console.log(data);
+              })
+              .catch(error => console.log(error));
+      }
     </script>
+
   <div class="section">
     <h2>Water</h2>
     <button class="btn btn-primary" onclick = "sendPumpAction('/TriggerPump')" id="water_pump">Pump Water Now</button>
