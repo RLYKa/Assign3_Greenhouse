@@ -13,112 +13,17 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    let insertBtn = document.querySelector('#insert-btn');
-    insertBtn.addEventListener('click', function() {
-        fetch('/insert-data')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'error') {
-            alert(data.message);
-            return;
-            }
-            let table = document.querySelector('table');
-            let tbody = table.querySelector('tbody');
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-            <td>${data.tempA.ID}</td>
-            <td>${data.tempA.temperature}</td>
-            <td>${data.tempA.humidity}</td>
-            <td>${data.tempA.date_created}</td>
-            `;
-            tbody.insertBefore(tr, tbody.firstChild);
-        })
-        .catch(error => console.log(error));
-    });
-</script>
-<script>
-    // Function to fetch latest data and update the table
-    function updateTable() {
-        console.log('updateTable called');
-        fetch('/get-data')
-        .then(response=> response.json())
-        .then(data=> {
-            let table = document.querySelector('table');
-            let tbody = table.querySelector('tbody');
-            console.log(data);
 
-            // Replace the current table rows with the latest data
-            tbody.innerHTML = '';
-            data.tempA.forEach(tempA=> {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${tempA.ID}</td>
-                <td>${tempA.temperature}</td>
-                <td>${tempA.humidity}</td>
-                <td>${tempA.date_created}</td>
-            `;
-            tbody.appendChild(tr);
-            });
-            console.log(data.tempA);
-
-            // Update the warning message if necessary
-            let warning = document.querySelector('.alert-warning');
-            if (warning) {
-            if (data.warning) {
-                warning.style.display = 'block';
-            } else {
-                warning.style.display = 'none';
-            }
-            }
-        })
-        .catch(error => console.log(error));
-    }
-
-    // Call the function initially and every 10 seconds
-    updateTable();
-    setInterval(updateTable, 10000);
-
-    function insertData()
-    {
-        fetch('/insert-data')
-        .then(response => response.json())
-        .then(data => {
-            updateTable();
-            console.log(data);
-        })
-        .catch(error => console.log(error));
-    }
-</script>
   <style>
     .section {
       margin-bottom: 30px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
     }
     
-    .section h2 {
-      margin-bottom: 10px;
-    }
-    
-    .section p {
-      margin-bottom: 5px;
-    }
-    
-    .section button {
-      margin-right: 10px;
-    }
-    table {
-            margin: 20px 0;
-            font-size: 16px
-        }
-        
-    button {
-        margin: 20px 0;
-    }
-
-    tbody tr:nth-child(even){
-        background-color: #f2f2f2;
-    }
-  </style>
+</script>
+  
 </head>
 <body>
 <div class="container mt-5">
@@ -168,6 +73,33 @@
   </div>
 
   <!-- Water Section -->
+  <script>
+      function sendPumpAction(action) {
+        fetch(action)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "success") {
+              console.log("Action successful");
+              // handle successful response
+            } else {
+              console.error("Error:", data.message);
+              // handle error response
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            // handle fetch error
+          });
+      }
+      
+      
+    function sendNewPumpThres() {
+      var NewThres = document.getElementById("water_threshold_input").value;
+      sendAction('/NewThres='+NewThres);
+      console.log('/NewThres='+NewThres);
+    }
+    
+    </script>
   <div class="section">
     <h2>Water</h2>
     <button class="btn btn-primary" onclick = "sendPumpAction('/TriggerPump')" id="water_pump">Pump Water Now</button>

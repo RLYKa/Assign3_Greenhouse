@@ -40,14 +40,12 @@
         });
 
         $("#get_status").click(function(e) {
-        $.get("/get_status", function(data) {
-            var status = "";
-            for (var key in data) {
-                status += key + ": State - " + (data[key]["state"] ? "On" : "Off") + ", Threshold - " + data[key]["threshold"] + "<br>";
-            }
-            $("#status").html(status);
+            e.preventDefault();
+            $("#status").empty(); // Empty the previous status
+
+            // Request status from the edge
+            $.get("/get_status");
         });
-    });
     </script>
 </body>
 </html>
