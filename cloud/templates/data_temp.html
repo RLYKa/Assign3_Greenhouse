@@ -74,10 +74,10 @@ fetch('/temp_data1')
         // Remove the line response.json() since the response is already in JSON format
         
         for (var i = 0; i < data.tempA.length; i++) {
-            labels.push(data.tempA[i].date_created);
             temperatures.push(data.tempA[i].temperature);
             humidities.push(data.tempA[i].humidity);
             checklist.push(data.tempA[i].checklist);
+            labels.push(data.tempA[i].date_created);
         }
         var ctx = document.getElementById('myChart').getContext('2d');
         var chart = new Chart(ctx, {
