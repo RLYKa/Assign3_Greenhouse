@@ -73,7 +73,10 @@ fetch('/temp_data1')
             temperatures.push(data.tempA[i].temperature);
             humidities.push(data.tempA[i].humidity);
             checklist.push(data.tempA[i].checklist);
-            console.log(data);
+            console.log(temperatures);
+            console.log(humidities);
+            console.log(checklist);
+            console.log(labels);
         }
         var ctx = document.getElementById('myChart').getContext('2d');
         var chart = new Chart(ctx, {
