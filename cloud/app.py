@@ -614,6 +614,16 @@ def Aircontrol():
     time.sleep(1)
     return 'OK', 200
 
+@app.route('/Aircontrol2', methods=['POST'])
+def Aircontrol():
+    data = request.form
+    mqtt_client.publish('nodes/th/set2', payload=json.dumps({
+        'status': data.get('direction'), 
+        'speed': data.get('speed')
+    }))
+    time.sleep(1)
+    return 'OK', 200
+
 # update the checklist in plot 1
 @app.route('/update_checklist', methods=['POST'])
 def update_checklist():
