@@ -67,10 +67,15 @@
   <!-- Light Section -->
   <div class="section">
     <h2>Light</h2>
-    <p>Current status: {{ light_status}}</p>
-    <button class="btn btn-primary" id="light_toggle">Turn {{ light_toggle_text}}</button>
-    <p>Hours lights have been on: {{ light_hours_on}}</p>
+    <p>Current Light status: <span id="plot1_light_status"></span></p>
+    <p>Current Threshold: <span id="plot1_threshold"></span></p>
+    <p>Hours lights have been on: <span id="plot1_light_hours"></span></p>
+    <label for="duration_input">Duration (in seconds):</label>
+    <input type="number" id="duration_input" min="1" value="10">
+    <button class="btn btn-primary" id="light_toggle">Toggle</button>
+    <button class="btn btn-secondary" id="light_refresh">Refresh</button>
   </div>
+  
 
   <!-- Water Section -->
   <script>
@@ -226,6 +231,9 @@
     </form>
   </div>
 </div>
+<div class="d-flex justify-content-center">
+  <button type="button" class="btn btn-primary" onclick="updateTable()" id="check-btn">Refresh</button>
+</div>
   <script type="text/javascript">
     $(function(){
         // $("#direction").val(motorStatus);
@@ -253,7 +261,102 @@
         });
       });
   </script>
-</body>
+  <script>
+    function updateTable() {
+   $.ajax({
+       url: "/get_status",
+       type: "GET",
+       success: function(data) {
+         data = data.split(',');
+
+         document.getElementById('plot1_light_status').textContent = data[0] === "1" ? "On" : "Off";
+         document.getElementById('plot1_threshold').textContent = data[1];
+         document.getElementById('plot1_light_hours').textContent = data[8];
+      
+         setTimeout(function() {
+           location.reload();
+         }, 3000);
+
+       },
+       error: function() {
+           console.log('Error occurred while fetching data.');
+       }
+   });
+}
+ </script>
+  <script>
+    function updateLightStatus() {
+      $.ajax({
+        url: "/get_status",
+        type: "GET",
+        success: function(data) {
+          data = data.split(',');
+  
+          document.getElementById('plot1_light_status').textContent = data[0] === "1" ? "On" : "Off";
+          document.getElementById('plot1_threshold').textContent = data[1];
+          document.getElementById('plot1_light_hours').textContent = data[8];
+        },
+        error: function() {
+          console.log('Error occurred while fetching light status.');
+        }
+      });
+    }
+  
+    $(function() {
+      updateLightStatus();  // Call the function initially
+  
+      // Refresh button click event
+      $("#light_refresh").on('click', function() {
+        updateLightStatus();  // Call the function to update the light status
+      });
+    });
+  </script>
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+  const lightToggleBtn = document.getElementById("light_toggle");
+  const lightStatus = document.getElementById("plot1_light_status");
+  const durationInput = document.getElementById("duration_input");
+
+  lightToggleBtn.addEventListener("click", function() {
+    const currentStatus = lightStatus.innerText;
+    const action = currentStatus === "On" ? "off" : "on";
+    const duration = parseInt(durationInput.value);
+    if (isNaN(duration) || duration < 1) {
+      alert("Please enter a valid duration (greater than 0).");
+      return;
+    }
+    const payload = {
+      led_num: 1,  // Update with the appropriate LED number
+      duration: duration,
+      action: action
+    };
+
+    fetch("/led", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(response) {
+      if (response.ok) {
+        return response.text();
+      } else {
+        throw new Error("Failed to control the LED");
+      }
+    })
+    .then(function(responseText) {
+      // Update the light status dynamically
+      lightStatus.innerText = action === "on" ? "On" : "Off";
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+  });
+});
+
+  </script>
+  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>

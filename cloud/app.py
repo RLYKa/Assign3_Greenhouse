@@ -355,12 +355,23 @@ def change_threshold():
     return 'OK', 200
 
 
-@app.route('/control_led', methods=['POST'])
+@app.route('/led', methods=['POST'])
 def control_led():
-    index = request.form.get('index')
-    duration = request.form.get('duration')
-    mqtt_client.publish(TOPIC_LED, f"{index}:{duration}")
-    return 'OK', 200
+    data = request.json
+    led_num = data['led_num']
+    duration = data['duration']
+    if data['action'] == 'on':
+        payload = f"led_on_{led_num}_{duration}"
+    elif data['action'] == 'off':
+        payload = f"led_off_{led_num}_{duration}"
+    else:
+        return "Invalid action", 400
+
+    try:
+        mqtt_client.publish(TOPIC_LED, payload)
+        return "LED control message sent successfully"
+    except Exception as e:
+        return f"Failed to send LED control message: {str(e)}", 500
 
 @app.route('/LightDataVisualization')
 def LightDataVisualization():

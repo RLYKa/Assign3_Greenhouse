@@ -61,7 +61,19 @@ def on_message(client, userdata, msg):
     global send_status
     print(msg.topic, msg.payload)
     if msg.topic == TOPIC_LED_CONTROL:
-        ser.write(msg.payload)
+        payload = msg.payload.decode()
+        if payload.startswith("led_off"):
+            try:
+                led_num, duration = extract_led_num_and_duration(payload)
+                turn_off_led(led_num, duration)
+            except ValueError:
+                print("Invalid payload format for LED off")
+        elif payload.startswith("led_on"):
+            try:
+                led_num, duration = extract_led_num_and_duration(payload)
+                turn_on_led_for_duration(led_num, duration)
+            except ValueError:
+                print("Invalid payload format for LED on")
     elif msg.topic == TOPIC_THRESHOLD:
         ser.write(msg.payload)
     elif msg.topic == TOPIC_REQUEST_STATUS:
@@ -71,21 +83,21 @@ def on_message(client, userdata, msg):
     elif msg.topic == TOPIC_REQUEST_LDR:
         if msg.payload.decode() == "getLDR":
             send_ldr = True
-            get_ldr_from_arduino()
+            get_ldr_from_arduino() 
     elif msg.topic == TOPIC_REQUEST_HOUR:
         if msg.payload.decode() == "getHour":
-            query = query = """
-                                SELECT led_num, 
-                                    TIMESTAMPDIFF(HOUR, MIN_EVENTDATE, MAX_EVENTDATE) AS total_hours
-                                FROM (
-                                    SELECT led_num, 
-                                        MIN(eventDate) AS MIN_EVENTDATE, 
-                                        MAX(eventDate) AS MAX_EVENTDATE
-                                    FROM lightLog
-                                    WHERE eventType = 'on' AND DATE(eventDate) = CURDATE()
-                                    GROUP BY led_num
-                                ) AS subquery
-                            """
+            query = """
+                SELECT led_num, 
+                    TIMESTAMPDIFF(HOUR, MIN_EVENTDATE, MAX_EVENTDATE) AS total_hours
+                FROM (
+                    SELECT led_num, 
+                        MIN(eventDate) AS MIN_EVENTDATE, 
+                        MAX(eventDate) AS MAX_EVENTDATE
+                    FROM lightLog
+                    WHERE eventType = 'on' AND DATE(eventDate) = CURDATE()
+                    GROUP BY led_num
+                ) AS subquery
+            """
             cursor.execute(query)
 
             # Fetch the results
@@ -98,8 +110,7 @@ def on_message(client, userdata, msg):
             # Close the cursor and connection
             message = ','.join(hours)
             mqtt_client.publish(TOPIC_HOUR, message)
-            cursor.close()
-            db_connection.close()
+
 
 # MQTT Setup
 mqtt_client = mqtt.Client()
@@ -144,6 +155,25 @@ def insert_led_event(led_num, event_type, event_date):
     except mysql.connector.Error as e:
         print(f"Error inserting LED event: {e}")
 
+def extract_led_num_and_duration(payload):
+    parts = payload.split("_")
+    led_num = int(parts[2])
+    duration = int(parts[3])
+    return led_num, duration
+
+def turn_off_led(led_num, duration):
+    arduino_command = f"turnOffLED_{led_num}\n"
+    ser.write(arduino_command.encode())
+    time.sleep(duration)
+
+def turn_on_led_for_duration(led_num, duration):
+    arduino_command = f"turnOnLED_{led_num}\n"
+    ser.write(arduino_command.encode())
+    time.sleep(duration)
+    arduino_command = f"turnOffLED_{led_num}\n"
+    ser.write(arduino_command.encode())
+
+
 # Function to execute LED state insertion and event creation every 10 seconds
 def execute_led_state_insertion():
     ser.write(b"getStatus\n")  # Request LED status from the serial
@@ -155,6 +185,8 @@ def execute_led_state_insertion():
             event_type = "on" if state == '1' else "off"
             insert_led_event(led_num, event_type, event_date)
     threading.Timer(10, execute_led_state_insertion).start()
+
+
 
 
 # Start executing LED state insertion every 10 seconds
