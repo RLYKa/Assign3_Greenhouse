@@ -59,13 +59,14 @@
   // Fetch data from API
  // Fetch data from API
 fetch('/temp_data1')
-    .then(response => response.json())
-    .then(data => {
+    .then(response=> response.json())
+    .then(data=> {
         // Process data and create chart
         var labels = [];
         var temperatures = [];
         var humidities = [];
         var checklist = [];
+        print(data);
         
         // Remove the line response.json() since the response is already in JSON format
         
@@ -74,10 +75,6 @@ fetch('/temp_data1')
             temperatures.push(data.tempA[i].temperature);
             humidities.push(data.tempA[i].humidity);
             checklist.push(data.tempA[i].checklist);
-            console.log(temperatures);
-            console.log(humidities);
-            console.log(checklist);
-            console.log(labels);
         }
         var ctx = document.getElementById('myChart').getContext('2d');
         var chart = new Chart(ctx, {
