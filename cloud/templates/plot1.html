@@ -73,56 +73,32 @@
 
   <!-- Water Section -->
   <script>
-        function sendPumpAction(action) {
-          fetch('/pump_action', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: 'action=' + encodeURIComponent(action)
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === 'success') {
-              console.log('Action successful');
-              // handle successful response
-            } else {
-              console.error('Error:', data.message);
-              // handle error response
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            // handle fetch error
-          });
-        }
-
-        
-        
-      function sendNewPumpThres() {
-        var newThreshold = document.getElementById('water_threshold_input').value;
-        fetch('/set_threshold', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'new_threshold=' + encodeURIComponent(newThreshold)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            console.log('Threshold set successfully');
-            // handle successful response
-          } else {
-            console.error('Error:', data.message);
-            // handle error response
-          }
-        })
-        .catch(error => {
-          console.error(error);
-          // handle fetch error
-        });
+      function sendPumpAction(action) {
+          fetch(action)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.status === "success") {
+                      console.log("Action successful");
+                      // handle successful response
+                  } else {
+                      console.error("Error:", data.message);
+                      // handle error response
+                  }
+              })
+              .catch(error => {
+                  console.error(error);
+                  // handle fetch error
+              });
       }
+
+      function sendNewPumpThres() {
+          var NewThres = document.getElementById("water_threshold_input").value;
+          var action = "/thres1 = " + NewThres;
+          sendPumpAction(action);
+          console.log(action);
+      }
+</script>
+
 
       
       
