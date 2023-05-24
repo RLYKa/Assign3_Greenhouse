@@ -57,25 +57,25 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(TOPIC_REQUEST_HOUR)
     print("CONNACK received with code %s." % rc)
 
+# MQTT Callbacks
 def on_message(client, userdata, msg):
     global send_status
     print(msg.topic, msg.payload)
     if msg.topic == TOPIC_LED_CONTROL:
         payload = msg.payload.decode()
         if payload.startswith("led_off"):
-            try:
-                led_num, duration = extract_led_num_and_duration(payload)
-                turn_off_led(led_num, duration)
-            except ValueError:
-                print("Invalid payload format for LED off")
+            led_num, duration = extract_led_num_and_duration(payload)
+            turn_off_led(led_num, duration)
         elif payload.startswith("led_on"):
-            try:
-                led_num, duration = extract_led_num_and_duration(payload)
-                turn_on_led_for_duration(led_num, duration)
-            except ValueError:
-                print("Invalid payload format for LED on")
+            led_num, duration = extract_led_num_and_duration(payload)
+            turn_on_led_for_duration(led_num, duration)
     elif msg.topic == TOPIC_THRESHOLD:
-        ser.write(msg.payload)
+        payload = msg.payload.decode()
+        parts = payload.split("_")
+        if len(parts) == 3 and parts[0] == "setThreshold":
+            ldr_index = int(parts[1])
+            new_threshold = int(parts[2])
+            set_threshold(ldr_index, new_threshold)
     elif msg.topic == TOPIC_REQUEST_STATUS:
         if msg.payload.decode() == "getStatus":
             send_status = True
@@ -83,7 +83,7 @@ def on_message(client, userdata, msg):
     elif msg.topic == TOPIC_REQUEST_LDR:
         if msg.payload.decode() == "getLDR":
             send_ldr = True
-            get_ldr_from_arduino() 
+            get_ldr_from_arduino()
     elif msg.topic == TOPIC_REQUEST_HOUR:
         if msg.payload.decode() == "getHour":
             query = """
@@ -110,6 +110,14 @@ def on_message(client, userdata, msg):
             # Close the cursor and connection
             message = ','.join(hours)
             mqtt_client.publish(TOPIC_HOUR, message)
+
+# Function to set the LDR threshold
+def set_threshold(new_threshold):
+    arduino_command = f"setThreshold_{new_threshold}\n"
+    ser.write(arduino_command.encode())
+
+# Rest of the code remains the same...
+
 
 
 # MQTT Setup
@@ -143,6 +151,12 @@ def read_from_arduino():
                     mqtt_client.publish(TOPIC_STATUS, line)
                     send_status = False
             time.sleep(1)
+
+# Function to set the LDR threshold
+def set_threshold(ldr_index, new_threshold):
+    arduino_command = f"setThreshold_{ldr_index}_{new_threshold}\n"
+    ser.write(arduino_command.encode())
+
 
 # Function to insert LED event into the lightLog table
 def insert_led_event(led_num, event_type, event_date):

@@ -347,12 +347,17 @@ def get_status():
 
 
 
-@app.route('/change_threshold', methods=['POST'])
-def change_threshold():
-    index = request.form.get('index')
-    new_threshold = request.form.get('new_threshold')
-    mqtt_client.publish(TOPIC_THRESHOLD, f"{index}:{new_threshold}")
-    return 'OK', 200
+@app.route('/set_threshold', methods=['POST'])
+def set_threshold():
+    data = request.json
+    ldr_index = data['ldr_index']
+    new_threshold = data['new_threshold']
+
+    # Prepare the MQTT message
+    command = f"T{ldr_index}_{new_threshold}"
+    mqtt_client.publish(topic="nodes/ledControl", payload=command)
+
+    return "Threshold updated successfully"
 
 
 @app.route('/led', methods=['POST'])
