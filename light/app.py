@@ -106,6 +106,8 @@ TOPIC_STATUS = 'nodes/status'
 TOPIC_THRESHOLD = 'nodes/threshold'
 TOPIC_LED = 'nodes/ledControl'
 TOPIC_REQUEST_STATUS = "nodes/requestStatus"
+TOPIC_REQUEST_HOUR = "nodes/requestHour"
+TOPIC_HOUR = "nodes/hour"
 
 
 # Callback functions
@@ -127,7 +129,7 @@ def on_subscribe(client, userdata, mid, granted_qos, properties=None):
 
 
 def on_message(client, userdata, msg):
-    #Gordon Part
+    # Gordon Part
     payload = msg.payload.decode("utf-8")
     topic = msg.topic
 
@@ -138,13 +140,49 @@ def on_message(client, userdata, msg):
         val = (data['temp'], data['humd'])
         cursor.execute(sql, val)
         mydb.commit()
-    #until here
-
+    
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     message = str(msg.payload.decode("utf-8"))
     receiving_topic = str(msg.topic)
+    
     if receiving_topic == "nodes/water" and message.startswith('{"thresLog":'):
         read_water_node_json(message)
+
+    elif receiving_topic == TOPIC_STATUS:
+        # Handle status message
+        # Extract the data from the MQTT message
+        status_data = message.split(',')
+        led1_status = status_data[0]
+        ldr1_threshold = status_data[1]
+        led2_status = status_data[2]
+        ldr2_threshold = status_data[3]
+        led3_status = status_data[4]
+        ldr3_threshold = status_data[5]
+
+        # Insert data into node_status table
+        query = "INSERT INTO node_status (led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold) VALUES (%s, %s, %s, %s, %s, %s)"
+        values = (led1_status, ldr1_threshold, led2_status, ldr2_threshold, led3_status, ldr3_threshold)
+        cursor = mydb.cursor()
+        cursor.execute(query, values)
+        mydb.commit()
+
+    elif receiving_topic == TOPIC_HOUR:
+        # Handle hour message
+        # Extract the data from the MQTT message
+        hour_data = message.split(',')
+        led1_hour = hour_data[0]
+        led2_hour = hour_data[1]
+        led3_hour = hour_data[2]
+
+        # Insert data into node_hour table
+        query = "INSERT INTO node_hour (led1_hour, led2_hour, led3_hour) VALUES (%s, %s, %s)"
+        values = (led1_hour, led2_hour, led3_hour)
+        cursor = mydb.cursor()
+        cursor.execute(query, values)
+        mydb.commit()
+
+    # Print the MQTT message
+    print("Received message:", msg.topic, msg.payload)
 
         
 
@@ -181,13 +219,14 @@ def restart_service():
 
 @app.route('/get_status', methods=['GET'])
 def get_status():
+    cursor = mydb.cursor()
+
     mqtt_client.publish(TOPIC_REQUEST_STATUS, "getStatus")
+    mqtt_client.publish(TOPIC_REQUEST_HOUR, "getHour")
     mqtt_client.publish('nodes/water', "refresh")
-    time.sleep(3)
-    restart_service()
-    #time.sleep(1)
-    #restart_script()
-    return 'OK', 200
+
+    return "Status update triggered", 200
+
 
 
 @app.route('/change_threshold', methods=['POST'])
