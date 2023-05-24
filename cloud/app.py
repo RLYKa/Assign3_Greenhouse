@@ -598,7 +598,7 @@ def action(action):
             percentage = action.replace('thres2 =', '')
             percentage = int(percentage)
             new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
-            action = (('thres1 = ' + str(new_thres)))
+            action = (('thres2 = ' + str(new_thres)))
             mqtt_client.publish("nodes/water", payload=action)
 
         if action == 'PumpTrigger = 3' : 
@@ -614,7 +614,7 @@ def action(action):
             percentage = action.replace('thres3 =', '')
             percentage = int(percentage)
             new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
-            action = (('thres1 = ' + str(new_thres)))
+            action = (('thres3 = ' + str(new_thres)))
             mqtt_client.publish("nodes/water", payload=action)
         return jsonify({"status": "success"})
     else:
