@@ -84,7 +84,7 @@
 			})
 			.catch(error => console.log(error));
 		}
-	</script> -->
+	</script>
 
 
 	<!-- Add some basic styles -->
@@ -153,26 +153,25 @@
 			<thead>
 				<tr>
 					<th>Plot ID</th>
+					<th>Current Light Hour</th>
 					<th>Light Status</th>
 					<th>Current Thershold</th>
 					<th>Light Activated for (hours)</th>
 					<th>Soil Moisture (%)</th>
 					<th>Current Humidity (%)</th>
 					<th>Current Temperature (Celcius)</th>
-				</tr>
-			</thead>
-			<tbody>
-				
+					
+				{% for device in devices %}
 				<tr>
-					<td>{{ data.id1 }}</td>
-					<td>{{ device.led1 }}</td>
-					<td>{{ device.lightThres1 }}</td>
-					<td>{{ device.lightHour1 }}</td>
+					<td>{{ device.id }}</td>
+					<td>{{ device.light }}</td>
+					<td>{{ device.led}}</td>
+					<td>{{ device.lightThres}}</td>
+					<td>{{ device.lightHour}}</td>
 					<td>{{ device.moisture }}</td>
-					<td>{{ device.humidity }}</td>
-					<td>{{ device.temp }}</td>
-				</tr>
-			</tbody>
+					<td>{{ device.humidity}}</td>
+					<td>{{ device.temp}}</td>
+
 		</table>
 		<button type="button" class="btn btn-primary" onclick="insertData()" id="insert-btn">Check</button>
 	</div>
