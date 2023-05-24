@@ -584,6 +584,38 @@ def action(action):
             new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
             action = (('thres1 = ' + str(new_thres)))
             mqtt_client.publish("nodes/water", payload=action)
+
+        if action == 'PumpTrigger = 2' : 
+            mqtt_client.publish("nodes/water", payload=action)
+          
+        if action == 'Pump2_Pause = 1' : 
+            mqtt_client.publish("nodes/water", payload=action)
+           
+        if action == 'Pump2_Pause = 0' : 
+            mqtt_client.publish("nodes/water", payload=action)
+          
+        if action.startswith('thres2 = '):
+            percentage = action.replace('thres2 =', '')
+            percentage = int(percentage)
+            new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
+            action = (('thres1 = ' + str(new_thres)))
+            mqtt_client.publish("nodes/water", payload=action)
+
+        if action == 'PumpTrigger = 3' : 
+            mqtt_client.publish("nodes/water", payload=action)
+          
+        if action == 'Pump3_Pause = 1' : 
+            mqtt_client.publish("nodes/water", payload=action)
+           
+        if action == 'Pump3_Pause = 0' : 
+            mqtt_client.publish("nodes/water", payload=action)
+          
+        if action.startswith('thres3 = '):
+            percentage = action.replace('thres3 =', '')
+            percentage = int(percentage)
+            new_thres = round((100.0 - percentage) / 100.0 * 1024.0)
+            action = (('thres1 = ' + str(new_thres)))
+            mqtt_client.publish("nodes/water", payload=action)
         return jsonify({"status": "success"})
     else:
         return jsonify({"status": "error", "message": "Invalid method"})
