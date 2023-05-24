@@ -68,8 +68,10 @@ mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(BROKER, 8883, 60)
 
-# Flag to control status publishing
+# Flags to control status publishing
 send_status = False
+send_ldr = False
+last_db_update = 0  # Track the time of the last database update
 
 # Function to send status update
 def send_status_update():
@@ -82,16 +84,26 @@ def send_LDR_update():
 
 # Function for reading LDR values and status
 def read_ldr_status():
-    global send_status
+    global send_status, send_ldr, last_db_update
     while True:
         if ser.in_waiting > 0:
             line = ser.readline().decode('utf-8').strip()
             elements = line.split(',')
-            if len(elements) > 5 and send_status:  # this is an Status update
-                mqtt_client.publish(TOPIC_STATUS, line)
-            elif 3 < len(elements) < 5 and send_ldr:  # this is a LDR Value update
-                mqtt_client.publish(TOPIC_LDR, line)
-                send_status = False
+            if len(elements) > 5:  # this is a Status update
+                if send_status:
+                    mqtt_client.publish(TOPIC_STATUS, line)
+                    send_status = False
+                elif time.time() - last_db_update > 5:  # Insert into the database every 5 seconds
+                    for i in range(3):
+                        state = elements[i]
+                        query = "INSERT INTO light_db (led_num, eventType) VALUES (%s, %s)"
+                        cursor.execute(query, (i, 'on' if state == '1' else 'off'))
+                        db_connection.commit()
+                    last_db_update = time.time()
+            elif 3 < len(elements) < 5:  # this is a LDR Value update
+                if send_ldr:
+                    mqtt_client.publish(TOPIC_LDR, line)
+                    send_ldr = False
         time.sleep(1)
 
 # Start the LDR reading thread
