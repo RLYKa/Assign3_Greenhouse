@@ -133,6 +133,7 @@ def on_message(client, userdata, msg):
 
     if topic == "nodes/th":
         data = json.loads(payload)
+        print("nodes/th data: " + payload)
         cursor = mydb.cursor()
         sql = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
         val = (data['temp'], data['humd'])
@@ -437,10 +438,6 @@ def insert_data():
     status = 'success'
     try:
         mqtt_client.publish('nodes/th/get', payload='get')
-
-        # cursor = mydb.cursor()
-        # query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
-        # cursor.execute(query)
         status = 'success'
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
