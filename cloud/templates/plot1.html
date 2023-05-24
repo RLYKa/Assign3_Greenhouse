@@ -205,7 +205,7 @@
       </div>
     </form>
   </br>
-    <form method="POST" action="/Aircontrol">
+    <form method="POST" action="#">
       <div class="form-group">
         <label for="direction">Direction</label>
         <select class="form-control" id="direction" name="direction">
@@ -222,7 +222,7 @@
           <option value="3">High</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-primary">Set</button>
+      <button id='motor-submit' type="submit" class="btn btn-primary">Set</button>
     </form>
   </div>
 </div>
@@ -230,6 +230,25 @@
     $(function(){
         $("#direction").val(motorStatus);
         $("#speed").val(motorSpeed);
+
+        $("#motor-submit").click(function(e) {
+          e.preventDefault();
+
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", '/Aircontrol', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
+              value: {
+                status: $("#direction").val(),
+                speed: $("#speed")
+              }
+          }));
+          console.log(xhr.status);
+          if(xhr.status == 200) {
+            console.log('data sent');
+          }
+          else console.log('data not send');
+        });
       });
   </script>
 </body>
