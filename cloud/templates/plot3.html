@@ -53,57 +53,150 @@
   <canvas id="myChart"></canvas>
 </div>
 
+  
+  <!-- Light Section -->
+  <div class="section">
+    <h2>Light</h2>
+    <p>Current status: {{ light_status}}</p>
+    <button class="btn btn-primary" id="light_toggle">Turn {{ light_toggle_text}}</button>
+    <p>Hours lights have been on: {{ light_hours_on}}</p>
+  </div>
+
+  <!-- Water Section -->
   <script>
-    // Fetch data from API
-    fetch('/get-data3')
-        .then(response => response.json())
-        .then(data => {
-            // Process data and create chart
-            var labels = [];
-            var motorStatus = [];
-            var motorSpeed = [];
-            for (var i = 0; i < data.AirControlDB.length; i++) {
-                labels.push(data.AirControlDB[i].data_created);
-                motorStatus.push(data.AirControlDB[i].State);
-                motorSpeed.push(data.AirControlDB[i].Level);
-            }
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'State',
-                        data: motorStatus,
-                        borderColor: 'red',
-                        fill: false
-                    }, {
-                        label: 'Level',
-                        data: motorSpeed,
-                        borderColor: 'blue',
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Air Control Data'
-                    },
-                    scales: {
-                        xAxes: [{
-                            type: 'time',
-                            time: {
-                                displayFormats: {
-                                    minute: 'h:mm a'
-                                }
-                            }
-                        }]
-                    }
-                }
-            });
-        });
+      function sendPumpAction(action) {
+          fetch(action)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.status === "success") {
+                      console.log("Action successful");
+                      // handle successful response
+                  } else {
+                      console.error("Error:", data.message);
+                      // handle error response
+                  }
+              })
+              .catch(error => {
+                  console.error(error);
+                  // handle fetch error
+              });
+      }
+
+      function sendNewPumpThres() {
+          var NewThres = document.getElementById("water_threshold_input").value;
+          var action = "/thres3 = " + NewThres;
+          sendPumpAction(action);
+          console.log(action);
+      }
 </script>
+
+  <div class="section">
+    <h2>Water</h2>
+    <button class="btn btn-primary" onclick = "sendPumpAction('/PumpTrigger = 3')" id="water_pump">Pump Water Now</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump3_Pause = 1')" id="water_pause">Pause</button>
+    <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump3_Pause = 0')" id="water_resume">Resume</button>
+    <div class="input-group mb-3">
+      <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Current: {{ moisture_threshold }})">
+      <div class="input-group-append">
+        <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
+      </div>
+    </div>
+    <p>Current Moisture Level: {{ moisture_level }}</p>
+  </div>
+
+  <!-- Temperature Section -->
+  <script>
+    // Temperature section (Gordon Part)
+          // Function to fetch latest data and update the table
+        function updateTable() {
+        console.log('updateTable called');
+        fetch('/temp_data_plot1')
+        .then(response=> response.json())
+        .then(data=> {
+            let table = document.querySelector('table');
+            let tbody = table.querySelector('tbody');
+            console.log(data);
+
+            // Replace the current table rows with the latest data
+            tbody.innerHTML = '';
+            data.tempA.forEach(tempA=> {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${tempA[0]}</td>
+                <td>${tempA[1]}</td>
+                <td>${tempA[2]}</td>
+                <td>${tempA[4]}</td>
+            `;
+            tbody.appendChild(tr);
+            });
+            console.log(data.tempA);
+
+            // Update the warning message if necessary
+            let warning = document.querySelector('.alert-warning');
+            if (warning) {
+            if (data.warning) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+            }
+        })
+        .catch(error => console.log(error));
+    }
+    // Call the function initially and every 10 seconds
+    updateTable();
+    setInterval(updateTable, 10000);
+      function insertData() {
+              fetch('/insert-data')
+              .then(response => response.json())
+              .then(data => {
+                if (data.status === "success") {
+                  console.log("Action successful");
+                  updateTable();
+                  // handle successful response
+                } else {
+                  console.error("Error:", data.message);
+                  // handle error response
+                }
+              })
+              .catch(error => console.log(error));
+      }
+  </script>
+  
+  <div class="section">
+    <h2>Temperature</h2>
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>ID</th>
+              <th>Temperature (°C)</th>
+              <th>Humidity (%)</th>
+              <th>Date Created</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for tempA in tempA %}
+          <tr>
+              <td>{{ tempA.ID }}</td>
+              <td>{{ tempA.temperature }}</td>
+              <td>{{ tempA.humidity }}</td>
+              <td>{{ tempA.date_created }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" onclick="insertData()" id="insert-btn">Check</button>
+
+    <form method="POST" action="/update_checklist">
+      <div class ="form-group">
+          <label for="new_value" >Set Value:</label>
+          <input type="number" step="any" id="new_value" name="new_value" />
+          <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
