@@ -342,8 +342,7 @@ def getTemp_Data():
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
         tempAs = []
-        return jsonify({'status' : 'error', 'message': 'Error decoding data'})
-
+        #return jsonify({'status' : 'error', 'message': 'Error decoding data'})
     return jsonify({'tempA' : tempAs})
 
     #return render_template('data_temp.html', tempAs=jsonify(tempAs))
