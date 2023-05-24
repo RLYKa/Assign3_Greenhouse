@@ -369,7 +369,8 @@ $(document).ready(function() {
     $.ajax({
       url: '/set_threshold',
       method: 'POST',
-      data: { ldr_index: ldrIndex, threshold: newThreshold },
+      data: JSON.stringify({ ldr_index: ldrIndex, new_threshold: newThreshold }),
+      contentType: 'application/json', // Set the content type to JSON
       success: function(response) {
         // Threshold update successful
         console.log('Threshold updated successfully');

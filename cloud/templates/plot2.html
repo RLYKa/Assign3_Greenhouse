@@ -74,6 +74,10 @@
     <input type="number" id="duration_input" min="1" value="10">
     <button class="btn btn-primary" id="light_toggle">Toggle</button>
     <button class="btn btn-secondary" id="light_refresh">Refresh</button>
+    <br>
+    <label for="threshold_input">New Threshold:</label>
+    <input type="number" id="threshold_input" min="0" value="100">
+    <button class="btn btn-success" id="threshold_update">Update Threshold</button>
   </div>
 
   <!-- Water Section -->
@@ -334,14 +338,20 @@ lightToggleBtn.addEventListener("click", function() {
 </script>
 
 <div class="d-flex justify-content-center">
-  <button type="button" class="btn btn-primary" onclick="updateTableZ()" id="check-btn">Refresh</button>
+  <button type="button" class="btn btn-primary" onclick="updateTable()" id="check-btn">Refresh</button>
 </div>
 <script>
-    function updateTableZ() {
+    function updateTable() {
    $.ajax({
        url: "/get_status",
        type: "GET",
        success: function(data) {
+         data = data.split(',');
+
+         document.getElementById('plot1_light_status').textContent = data[0] === "1" ? "On" : "Off";
+         document.getElementById('plot1_threshold').textContent = data[1];
+         document.getElementById('plot1_light_hours').textContent = data[8];
+      
          setTimeout(function() {
            location.reload();
          }, 3000);
@@ -353,8 +363,38 @@ lightToggleBtn.addEventListener("click", function() {
    });
 }
  </script>
+
+<script>
+  $(document).ready(function() {
+    // Update Threshold button click event
+    $('#threshold_update').click(function() {
+      // Hardcoded LDR index
+      var ldrIndex = 2;  // Replace with the desired LDR index
+      
+      // Get the new threshold value
+      var newThreshold = $('#threshold_input').val();
+      
+      // Send an AJAX request to the Flask route for threshold update
+      $.ajax({
+        url: '/set_threshold',
+        method: 'POST',
+        data: JSON.stringify({ ldr_index: ldrIndex, new_threshold: newThreshold }),
+        contentType: 'application/json', // Set the content type to JSON
+        success: function(response) {
+          // Threshold update successful
+          console.log('Threshold updated successfully');
+          // Perform any additional actions or update UI as needed
+        },
+        error: function(xhr, status, error) {
+          // Threshold update failed
+          console.error('Threshold update failed:', error);
+          // Handle the error or display an error message to the user
+        }
+      });
+    });
+  });
+  </script>
 </body>
->>>>>>> 8d4fe27781ae521ca4bac82b193757a0a178b474
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>

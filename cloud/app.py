@@ -97,12 +97,14 @@ mqtt_client.tls_set(tls_version=paho.ssl.PROTOCOL_TLSv1_2)
 
 mqtt_client.connect(broker, port)
 
-TOPIC_STATUS = 'nodes/status'
-TOPIC_THRESHOLD = 'nodes/threshold'
-TOPIC_LED = 'nodes/ledControl'
-TOPIC_REQUEST_STATUS = "nodes/requestStatus"
-TOPIC_REQUEST_HOUR = "nodes/requestHour"
+TOPIC_LED_CONTROL = "nodes/ledControl"
+TOPIC_THRESHOLD = "nodes/threshold"
+TOPIC_STATUS = "nodes/status"
+TOPIC_LDR = "nodes/ldr"
 TOPIC_HOUR = "nodes/hour"
+TOPIC_REQUEST_STATUS = "nodes/requestStatus"
+TOPIC_REQUEST_LDR= "nodes/requestLDR"
+TOPIC_REQUEST_HOUR= "nodes/requestHour"
 
 
 # Callback functions
@@ -355,9 +357,11 @@ def set_threshold():
 
     # Prepare the MQTT message
     command = f"T{ldr_index}_{new_threshold}"
-    mqtt_client.publish(topic="nodes/ledControl", payload=command)
-
-    return "Threshold updated successfully"
+    try:
+        mqtt_client.publish(TOPIC_LDR, payload=command)
+        return "Threshold message sent successfully"
+    except Exception as e:
+        return f"Failed to send threshold message: {str(e)}", 500
 
 
 @app.route('/led', methods=['POST'])
@@ -373,7 +377,7 @@ def control_led():
         return "Invalid action", 400
 
     try:
-        mqtt_client.publish(TOPIC_LED, payload)
+        mqtt_client.publish(TOPIC_LED_CONTROL, payload)
         return "LED control message sent successfully"
     except Exception as e:
         return f"Failed to send LED control message: {str(e)}", 500
