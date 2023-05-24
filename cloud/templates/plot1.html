@@ -205,7 +205,7 @@
       </div>
     </form>
   </br>
-    <form id="motor-form" method="POST">
+    <form id="motor-form" method="POST" action="/Aircontrol">
       <div class="form-group">
         <label for="direction">Direction</label>
         <select class="form-control" id="direction" name="direction">
@@ -232,23 +232,23 @@
         // $("#speed").val(motorSpeed);
 
         $("#motor-form").on('submit', function(e) {
-          e.preventDefault();
           console.log('motor form submitted');
+          // e.preventDefault();
 
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", '/Aircontrol', false);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.send(JSON.stringify({
-              value: {
-                status: $("#direction").val(),
-                speed: $("#speed").val()
-              }
-          }));
-          console.log(xhr.responseText);
-          if(xhr.status == 200) {
-            console.log('data sent');
-          }
-          else console.log('data not send');
+          // var xhr = new XMLHttpRequest();
+          // xhr.open("POST", '/Aircontrol', false);
+          // xhr.setRequestHeader('Content-Type', 'application/json');
+          // xhr.send(JSON.stringify({
+          //     value: {
+          //       status: $("#direction").val(),
+          //       speed: $("#speed").val()
+          //     }
+          // }));
+          // console.log(xhr.responseText);
+          // if(xhr.status == 200) {
+          //   console.log('data sent');
+          // }
+          // else console.log('data not send');
         });
       });
   </script>

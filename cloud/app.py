@@ -423,7 +423,7 @@ def getTemp_Data_plot1():
 
 @app.route('/Aircontrol', methods=['POST'])
 def motor_control():
-    data = json.loads(request.json)
+    data = request.form
     status = data['status']
     speed = data['speed']
     mqtt_client.publish('nodes/th/set', json.dumps({
