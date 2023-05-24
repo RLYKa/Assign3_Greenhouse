@@ -62,11 +62,11 @@
 </div>
 
 <script>
-  let myChart;
+  let chart;
 
   function loadPlot1TH(){ 
-    if (myChart) {
-      myChart.destroy();
+    if (chart) {
+      chart.destroy();
     }
   
     // fetch the data
@@ -87,7 +87,7 @@
               labels.push(data.tempA[i][4]);
           }
           var ctx = document.getElementById('myChart').getContext('2d');
-          var chart = new Chart(ctx, {
+           chart = new Chart(ctx, {
               type: 'line',
               data: {
                   labels: labels,
@@ -129,8 +129,8 @@
       });
   }
   function loadPlot2TH(){ 
-    if (myChart) {
-      myChart.destroy();
+    if (chart) {
+      chart.destroy();
     }
   
     // fetch the data
@@ -151,7 +151,7 @@
               labels.push(data.tempA[i][4]);
           }
           var ctx = document.getElementById('myChart').getContext('2d');
-          var chart = new Chart(ctx, {
+          chart = new Chart(ctx, {
               type: 'line',
               data: {
                   labels: labels,
