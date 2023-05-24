@@ -205,7 +205,7 @@
       </div>
     </form>
   </br>
-    <form id="motor-form" method="POST" action="#">
+    <form id="motor-form" method="POST">
       <div class="form-group">
         <label for="direction">Direction</label>
         <select class="form-control" id="direction" name="direction">
@@ -228,10 +228,10 @@
 </div>
   <script type="text/javascript">
     $(function(){
-        $("#direction").val(motorStatus);
-        $("#speed").val(motorSpeed);
+        // $("#direction").val(motorStatus);
+        // $("#speed").val(motorSpeed);
 
-        $("#motor-form").submit(function(e) {
+        $("#motor-form").on('submit', function(e) {
           e.preventDefault();
           console.log('motor form submitted');
 
