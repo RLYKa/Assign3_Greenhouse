@@ -156,6 +156,22 @@ mqtt_client.on_publish = on_publish
 
 @app.route('/')
 def index():
+    #Retrieve the current temperature, humidity, and weather status from the database
+    cursor = mydb.cursor()
+    query = "SELECT temperature, humidity, status FROM weather_log LIMIT 1"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    cursor.close()
+
+    if result:
+        temperature, humidity, status = result
+        # Format the temperature, humidity, and status as desired for the message
+        message = f"Current Temperature: {temperature}°C, Humidity: {humidity}, Weather Status: {status}"
+        # Check if the same message has been shown today
+        # You can use a variable or database to store the last shown message date and compare it with the current date
+
+        # Render the template with the message variable
+        return render_template('index.html', weather=message)
     return render_template('index.html')
 
 
