@@ -4,6 +4,18 @@ import paho.mqtt.client as paho
 import json
 import mysql.connector
 
+import subprocess
+import time
+import threading
+'''
+def restart_service():
+  while True:
+    subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
+    time.sleep(5)
+thread = threading.Thread(target=restart_service)
+thread.start()
+'''
+
 def read_water_node_json(message):
   # Load JSON data
   data = json.loads(message)
@@ -147,10 +159,34 @@ def index():
     return render_template('index.html')
 
 
+import os
+import sys
+import time
+
+def restart_script():
+    try:
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
+    except Exception as e:
+        print("An error occurred while restarting the script:", str(e))
+import subprocess
+
+def restart_service():
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'assign3.service'])
+        print("Service restarted successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while restarting the service:", str(e))
+
+
 @app.route('/get_status', methods=['GET'])
 def get_status():
     mqtt_client.publish(TOPIC_REQUEST_STATUS, "getStatus")
     mqtt_client.publish('nodes/water', "refresh")
+    time.sleep(3)
+    restart_service()
+    #time.sleep(1)
+    #restart_script()
     return 'OK', 200
 
 
@@ -431,9 +467,9 @@ def datavisualization():
 
 
 # Route for rendering the plot1 page
+"""
 @app.route('/plot1')
 def plot1():
-    
     try:
         cursor = mydb.cursor()
         query = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
@@ -462,6 +498,73 @@ def plot1():
         print("An error occurred:", str(e))
 
     return render_template('plot1.html', moisture_level=moisture_level, moisture_threshold=moisture_threshold)
+"""
+# Route for rendering the plot1 page
+@app.route('/plot1')
+def plot1():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_level = result[0]
+        cursor.close()
+    
+        # Apply a formula to the moisture level
+        moisture_level = (moisture_level - 1024) / -1024 * 100
+        print(moisture_level)
+    
+        cursor = mydb.cursor()
+        query = "SELECT thres FROM water_thres_log WHERE thres_num = '1' LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_threshold = result[0]
+        cursor.close()
+    
+        moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
+        print(moisture_threshold)
+    
+    except Exception as e:
+        print("An error occurred:", str(e))
+
+    return render_template('plot1.html', moisture_level=moisture_level, moisture_threshold=moisture_threshold)
+'''
+# Route for fetching the latest data for plot1
+@app.route('/get_latest_plot1_data', methods=['GET'])
+def get_latest_plot1_data():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT moisture_level FROM moisture_log1 ORDER BY timestamp DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_level = result[0]
+        cursor.close()
+
+        # Apply a formula to the moisture level
+        moisture_level = (moisture_level - 1024) / -1024 * 100
+ 
+        cursor = mydb.cursor()
+        query = "SELECT thres FROM water_thres_log WHERE thres_num = '1' LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        if result:
+            moisture_threshold = result[0]
+        cursor.close()
+
+        moisture_threshold = (moisture_threshold - 1024) / -1024 * 100
+
+        return jsonify({'moisture_level': moisture_level, 'moisture_threshold': moisture_threshold})
+    
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return jsonify({'error': 'An error occurred'})
+'''
+
+
+    
 @app.route("/<action>", methods=['GET', 'POST']) 
 def action(action):
     if request.method == 'GET':
