@@ -620,7 +620,7 @@ def Aircontrol():
     return 'OK', 200
 
 @app.route('/Aircontrol2', methods=['POST'])
-def Aircontrol():
+def Aircontrol2():
     data = request.form
     mqtt_client.publish('nodes/th/set2', payload=json.dumps({
         'status': data.get('direction'), 
