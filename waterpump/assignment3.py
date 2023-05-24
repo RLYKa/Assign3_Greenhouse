@@ -118,7 +118,36 @@ def read_from_port():
                         cursor.execute("UPDATE coorLog SET longitude = (%s)", (y,))
                         mydb.commit()
                         cursor.close()
-                                          
+                    elif y.startswith("Thres 1: "):
+                        substring = "Thres 1: "
+                        y = y.replace(substring, "")
+                        y  = int(y)
+                        y = round(((y - 1024) / -1024.0) * 100, 2)
+                        y = str(y)
+                        cursor = mydb.cursor()
+                        cursor.execute("UPDATE thresLog SET thres = (%s) WHERE thres_num = 1", (y,))
+                        mydb.commit()
+                        cursor.close()
+                    elif y.startswith("Thres 2: "):
+                        substring = "Thres 2: "
+                        y = y.replace(substring, "")
+                        y  = int(y)
+                        y = round(((y - 1024) / -1024.0) * 100, 2)
+                        y = str(y)
+                        cursor = mydb.cursor()
+                        cursor.execute("UPDATE thresLog SET thres = (%s) WHERE thres_num = 2", (y,))
+                        mydb.commit()
+                        cursor.close()
+                    elif y.startswith("Thres 3: "):
+                        substring = "Thres 3: "
+                        y = y.replace(substring, "")
+                        y  = int(y)
+                        y = round(((y - 1024) / -1024.0) * 100, 2)
+                        y = str(y)
+                        cursor = mydb.cursor()
+                        cursor.execute("UPDATE thresLog SET thres = (%s) WHERE thres_num = 3", (y,))
+                        mydb.commit()
+                        cursor.close()                      
                    
 
                     
@@ -280,13 +309,34 @@ def publish_data():
 
 
 def pump_pause(x):
-
+    if x == 1:
+        ser.write(b"Pump1_Pause = 1\n")
+    elif x == 2:
+        ser.write(b"Pump2_Pause = 1\n")
+    elif x == 3:
+        ser.write(b"Pump3_Pause = 1\n")
 def pump_resume(x):
-
+    if x == 1:
+        ser.write(b"Pump1_Pause = 0\n")
+    elif x == 2:
+        ser.write(b"Pump2_Pause = 0\n")
+    elif x == 3:
+        ser.write(b"Pump3_Pause = 0\n")
 def pump_thres(pump, thres):
-    
+    # round((100.0 - percentage) / 100.0 * 1024.0)
+    if pump == 1:
+        ser.write(('thres1 = ' + str(thres) + '\n').encode('utf-8'))
+    elif pump == 2:
+        ser.write(('thres2 = ' + str(thres) + '\n').encode('utf-8'))
+    elif pump == 3:
+        ser.write(('thres3 = ' + str(thres) + '\n').encode('utf-8'))
 def pump_trigger(x):
-    
+    if x == 1:
+        ser.write(b"PumpTrigger = 1\n")
+    elif x == 2:
+        ser.write(b"PumpTrigger = 2\n")
+    elif x == 3:
+        ser.write(b"PumpTrigger = 3\n")   
 # setting callbacks for different events to see if it works, print the message etc.
 def on_connect(client, userdata, flags, rc, properties=None):
     client.subscribe("nodes/water", qos=1)
@@ -323,8 +373,6 @@ def on_message(client, userdata, msg):
         pump_trigger(1)
     elif (message == "PumpTrigger = 2" and topic == "nodes/water"):
         pump_trigger(2)
-    elif (message == "PumpTrigger = 3" and topic == "nodes/water"):
-        pump_trigger(3)
     elif (message == "PumpTrigger = 3" and topic == "nodes/water"):
         pump_trigger(3)
     elif (message.startswith("thres1 = ") and topic == "nodes/water"):
@@ -569,4 +617,3 @@ def moisture_level():
 if __name__ == "__main__":
     app.run(host="192.168.137.219", port=8080, debug=False)
     '''
-
