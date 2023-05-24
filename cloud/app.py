@@ -538,6 +538,10 @@ def insert_data():
     status = 'success'
     try:
         mqtt_client.publish('nodes/th/get', payload='get')
+
+        # cursor = mydb.cursor()
+        # query = "INSERT INTO tempA (temperature, humidity) VALUES (%s, %s)"
+        # cursor.execute(query)
         status = 'success'
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))

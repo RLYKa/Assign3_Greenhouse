@@ -6,20 +6,16 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Add some basic styles -->
     <style>
         table {
             margin: 20px 0;
-            font-size: 16px
+            font-size: 16px;
         }
-        
         button {
             margin: 20px 0;
         }
-        tbody tr:nth-child(even){
+        tbody tr:nth-child(even) {
             background-color: #f2f2f2;
             color: green;
         }
@@ -28,14 +24,9 @@
 <body>
     <div class="container">
         <h1 class="my-5">Portable Greenhouse System</h1>
-        <script>
-			function sendMessage() {
-			}
-		  </script>
-		{% if weather %}
-			<div class="alert alert-warning">{{ weather }}</div>
-		{% endif %}
 
+        <!-- Your code for warning alerts here -->
+        
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">Overview</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,38 +34,40 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav nav nav-pills">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Overview</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/plot1">Plot 1</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/plot2">Plot 2</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/plot3">Plot 3</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Data Visualization
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="/LightDataVisualization">Light</a>
-                  <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
-                  <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
-                </div>
-              </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/">Overview</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/plot1">Plot 1</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/plot2">Plot 2</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/plot3">Plot 3</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Data Visualization
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="/LightDataVisualization">Light</a>
+                      <a class="dropdown-item" href="/WaterDataVisualization">Water</a>
+                      <a class="dropdown-item" href="/TempDataVisualization">Temperature</a>
+                    </div>
+                </li>
               </ul>
             </div>
-          </nav>
-          <table class="table table-striped">
+        </nav>
+
+        <table class="table table-striped">
             <thead>
               <tr>
                 <th>Plot ID</th>
                 <th>Light Status</th>
                 <th>Current Threshold</th>
                 <th>Light Activated for (hours)</th>
+				<th>Soil Moisture (%)</th>
               </tr>
             </thead>
             <tbody>
@@ -83,94 +76,70 @@
                 <td id="plot1_light_status"></td>
                 <td id="plot1_threshold"></td>
                 <td id="plot1_light_hours"></td>
+				<td id="plot1_moisture"></td>
               </tr>
               <tr>
                 <td id="plot2_id"></td>
                 <td id="plot2_light_status"></td>
                 <td id="plot2_threshold"></td>
                 <td id="plot2_light_hours"></td>
+				<td id="plot2_moisture"></td>
               </tr>
               <tr>
                 <td id="plot3_id"></td>
                 <td id="plot3_light_status"></td>
                 <td id="plot3_threshold"></td>
                 <td id="plot3_light_hours"></td>
+				<td id="plot3_moisture"></td>
               </tr>
             </tbody>
-          </table>
+        </table>
           
-        <button type="button" class="btn btn-primary" onclick="insertData()" id="insert-btn">Check</button>
+        <button type="button" class="btn btn-primary" onclick="updateTable()" id="check-btn">Check</button>
     </div>
 
-    <button id="get_status" onclick="getStatus()">Get Status</button>
-
-    <div id="status"></div>
-    
-    <!-- Link to Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-j/RvBgTmRdY2T2mJx0x/QaM20RSDZGB9jOU2PfGGzIKh/uCh1wMzqM0K1+fC5U5G6fugrj9OAT6ThO/hhBnvkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
     <script>
-		function getStatus() {
-			// Empty the previous status
-			document.getElementById('status').innerHTML = "";
-	
-			// Request status from the edge
-			fetch('/get_status')
-				.then(response => {
-					if (response.ok) {
-						return response.text();
-					} else {
-						throw new Error('Error in request');
-					}
-				})
-				.then(data => {
-					// Process the received data
-					processData(data);
-				})
-				.catch(error => {
-					console.log(error);
-				});
-		}
-	
-		function processData(data) {
-			// Split the data into individual values
-			const values = data.split(',');
-	
-			if (values.length === 12) {
-				// If the data is from "nodes/status"
-				const plot1_id = values[0].trim();
-				const plot1_light_status = values[1].trim();
-				const plot1_threshold = values[2].trim();
-				const plot1_light_hours = values[3].trim();
-				const plot2_id = values[4].trim();
-				const plot2_light_status = values[5].trim();
-				const plot2_threshold = values[6].trim();
-				const plot2_light_hours = values[7].trim();
-				const plot3_id = values[8].trim();
-				const plot3_light_status = values[9].trim();
-				const plot3_threshold = values[10].trim();
-				const plot3_light_hours = values[11].trim();
-	
-				// Update the table
-				document.getElementById('plot1_id').innerHTML = plot1_id;
-				document.getElementById('plot1_light_status').innerHTML = plot1_light_status;
-				document.getElementById('plot1_threshold').innerHTML = plot1_threshold;
-				document.getElementById('plot1_light_hours').innerHTML = plot1_light_hours;
-				document.getElementById('plot2_id').innerHTML = plot2_id;
-				document.getElementById('plot2_light_status').innerHTML = plot2_light_status;
-				document.getElementById('plot2_threshold').innerHTML = plot2_threshold;
-				document.getElementById('plot2_light_hours').innerHTML = plot2_light_hours;
-				document.getElementById('plot3_id').innerHTML = plot3_id;
-				document.getElementById('plot3_light_status').innerHTML = plot3_light_status;
-				document.getElementById('plot3_threshold').innerHTML = plot3_threshold;
-				document.getElementById('plot3_light_hours').innerHTML = plot3_light_hours;
-			}
-		}
-	
-		// Call getStatus() initially to populate the table
-		getStatus();
-	</script>
-	
-    
+       function updateTable() {
+    $.ajax({
+        url: "/get_status",
+        type: "GET",
+        success: function(data) {
+            data = data.split(',');
+
+            // Hardcoded plot IDs
+            var plot1ID = "Plot 1";
+            var plot2ID = "Plot 2";
+            var plot3ID = "Plot 3";
+
+			var moisture1 = ((data[11] - 1024) / -1024 * 100).toFixed(2);
+            var moisture2 = ((data[12] - 1024) / -1024 * 100).toFixed(2);
+            var moisture3 = ((data[13] - 1024) / -1024 * 100).toFixed(2);
+
+
+            document.getElementById('plot1_id').textContent = plot1ID;
+			document.getElementById('plot1_light_status').textContent = data[1] === "1" ? "On" : "Off";
+            document.getElementById('plot1_threshold').textContent = data[2];
+            document.getElementById('plot1_light_hours').textContent = data[8];
+			document.getElementById('plot1_moisture').textContent = moisture1;
+
+            document.getElementById('plot2_id').textContent = plot2ID;
+            document.getElementById('plot2_light_status').textContent = data[3]=== "1" ? "On" : "Off";
+            document.getElementById('plot2_threshold').textContent = data[4];
+			document.getElementById('plot2_light_hours').textContent = data[9];
+			document.getElementById('plot2_moisture').textContent = moisture2;
+
+            document.getElementById('plot3_id').textContent = plot3ID;
+            document.getElementById('plot3_light_status').textContent = data[5]=== "1" ? "On" : "Off";
+            document.getElementById('plot3_threshold').textContent = data[6];
+            document.getElementById('plot3_light_hours').textContent = data[10];
+			document.getElementById('plot3_moisture').textContent = moisture3;
+
+        },
+        error: function() {
+            console.log('Error occurred while fetching data.');
+        }
+    });
+}
+    </script>
 </body>
 </html>
