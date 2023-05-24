@@ -224,6 +224,52 @@ def index():
         return render_template('index.html', weather=message)
     return render_template('index.html')
 
+# Route to fetch the past 5 days of data from node_hour table
+@app.route('/get_hour_data')
+def get_hour_data():
+    # Prepare the SQL query to fetch the data for the past 5 days
+    query = "SELECT timestamp, led1_hour, led2_hour, led3_hour FROM node_hour WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 5 DAY)"
+
+    cursor = mydb.cursor()
+    cursor.execute(query)
+
+    # Fetch all the data rows
+    rows = cursor.fetchall()
+
+    # Prepare the data for the chart
+    labels = []
+    values1 = []
+    values2 = []
+    values3 = []
+
+    for row in rows:
+        timestamp = row[0]
+        led1_hour = row[1]
+        led2_hour = row[2]
+        led3_hour = row[3]
+
+        # Extract the date from the timestamp and format it as desired
+        date = timestamp.strftime("%Y-%m-%d")
+
+        # Append the date to the labels
+        labels.append(date)
+
+        # Append the values to their respective lists
+        values1.append(led1_hour)
+        values2.append(led2_hour)
+        values3.append(led3_hour)
+
+    # Prepare the chart data as a dictionary
+    chart_data = {
+        'labels': labels,
+        'values1': values1,
+        'values2': values2,
+        'values3': values3
+    }
+
+    # Convert the chart data to JSON and return as the response
+    return jsonify(chart_data)
+
 
 import os
 import sys

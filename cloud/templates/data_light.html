@@ -59,47 +59,55 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-  $(document).ready(function () {
-    // Perform an AJAX request to fetch data from the server
-    $.ajax({
-      url: '/get_hour_data', // Update with your Flask route
-      type: 'GET',
-      success: function (data) {
-        // Parse the received JSON data
-        var chartData = JSON.parse(data);
+ $(document).ready(function() {
+  // Fetch the chart data from the server
+  $.getJSON('/get_hour_data', function(data) {
+    // Extract the data from the response
+    var labels = data.labels;
+    var values1 = data.values1;
+    var values2 = data.values2;
+    var values3 = data.values3;
 
-        // Extract labels and values from the data
-        var labels = chartData.labels;
-        var values = chartData.values;
-
-        // Create the chart using Chart.js
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: labels,
-            datasets: [{
-              label: 'Light Data',
-              data: values,
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 1
-            }]
+    // Create a new bar chart
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'LED 1 Hour',
+            data: values1,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
           },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
+          {
+            label: 'LED 2 Hour',
+            data: values2,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          },
+          {
+            label: 'LED 3 Hour',
+            data: values3,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
           }
-        });
+        ]
       },
-      error: function () {
-        console.log('Error occurred while fetching data.');
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
       }
     });
   });
+});
 </script>
 </body>
 </html>
