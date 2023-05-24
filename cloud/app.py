@@ -338,12 +338,12 @@ def getTemp_Data():
         cursor = mydb.cursor()
         query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 10"
         cursor.execute(query)
-        tempAs = cursor.fetchall()
+        tempA = cursor.fetchall()
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
-        tempAs = []
+        tempA = []
         #return jsonify({'status' : 'error', 'message': 'Error decoding data'})
-    return jsonify({'tempA' : tempAs})
+    return jsonify({'tempA' : tempA})
 
     #return render_template('data_temp.html', tempAs=jsonify(tempAs))
 
