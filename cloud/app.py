@@ -540,6 +540,17 @@ def Aircontrol():
     time.sleep(1)
     return 'OK', 200
 
+# update the checklist
+@app.route('/update_checklist', methods=['POST'])
+def update_checklist():
+    new_value = float(request.form.get('new_value'))
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE tempA SET checklist = %s", (new_value,))
+    mydb.commit()
+    cursor.close()
+    message = "Checklist updated successfully"
+    #return "Checklist updated successfully"
+    return render_template('plot1.html', message=message)
 
 @app.route('/insert-data')
 def insert_data():

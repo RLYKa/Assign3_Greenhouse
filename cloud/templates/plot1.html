@@ -157,7 +157,7 @@
     updateTable();
     setInterval(updateTable, 10000);
       function insertData() {
-              fetch('/insert-data?plot=1')
+              fetch('/insert-data?plot=1')    
               .then(response => response.json())
               .then(data => {
                 if (data.status === "success") {
