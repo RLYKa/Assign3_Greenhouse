@@ -13,8 +13,10 @@ TOPIC_LED_CONTROL = "nodes/ledControl"
 TOPIC_THRESHOLD = "nodes/threshold"
 TOPIC_STATUS = "nodes/status"
 TOPIC_LDR = "nodes/ldr"
+TOPIC_HOUR = "nodes/hour"
 TOPIC_REQUEST_STATUS = "nodes/requestStatus"
 TOPIC_REQUEST_LDR= "nodes/requestLDR"
+TOPIC_REQUEST_HOUR= "nodes/requestHour"
 
 # Edge (Raspberry Pi) configuration
 edge_host = "localhost"
@@ -49,8 +51,10 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(TOPIC_THRESHOLD)
     client.subscribe(TOPIC_STATUS)
     client.subscribe(TOPIC_LDR)
+    client.subscribe(TOPIC_HOUR)
     client.subscribe(TOPIC_REQUEST_STATUS)
     client.subscribe(TOPIC_REQUEST_LDR)
+    client.subscribe(TOPIC_REQUEST_HOUR)
     print("CONNACK received with code %s." % rc)
 
 def on_message(client, userdata, msg):
@@ -68,6 +72,34 @@ def on_message(client, userdata, msg):
         if msg.payload.decode() == "getLDR":
             send_ldr = True
             get_ldr_from_arduino()
+    elif msg.topic == TOPIC_REQUEST_HOUR:
+        if msg.payload.decode() == "getHour":
+            query = query = """
+                                SELECT led_num, 
+                                    TIMESTAMPDIFF(HOUR, MIN_EVENTDATE, MAX_EVENTDATE) AS total_hours
+                                FROM (
+                                    SELECT led_num, 
+                                        MIN(eventDate) AS MIN_EVENTDATE, 
+                                        MAX(eventDate) AS MAX_EVENTDATE
+                                    FROM lightLog
+                                    WHERE eventType = 'on' AND DATE(eventDate) = CURDATE()
+                                    GROUP BY led_num
+                                ) AS subquery
+                            """
+            cursor.execute(query)
+
+            # Fetch the results
+            hours = []
+            results = cursor.fetchall()
+            for row in results:
+                total_hours = row[1]
+                hours.append(str(total_hours))
+
+            # Close the cursor and connection
+            message = ','.join(hours)
+            mqtt_client.publish(TOPIC_HOUR, message)
+            cursor.close()
+            db_connection.close()
 
 # MQTT Setup
 mqtt_client = mqtt.Client()
@@ -99,12 +131,6 @@ def read_from_arduino():
                 if send_status:  # this is a status response from Arduino
                     mqtt_client.publish(TOPIC_STATUS, line)
                     send_status = False
-                else:
-                    led_states = [int(elements[0]), int(elements[2]), int(elements[4])]
-                    event_date = time.strftime('%Y-%m-%d %H:%M:%S')
-                    for led_num, state in enumerate(led_states, start=1):
-                        event_type = "on" if state == 1 else "off"
-                        insert_led_event(led_num, event_type, event_date)
             time.sleep(1)
 
 # Function to insert LED event into the lightLog table
