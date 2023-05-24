@@ -342,10 +342,19 @@ def getTemp_Data():
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
         tempA = []
-        #return jsonify({'status' : 'error', 'message': 'Error decoding data'})
     return jsonify({'tempA' : tempA})
 
-    #return render_template('data_temp.html', tempAs=jsonify(tempAs))
+@app.route('/temp_data_plot1')
+def getTemp_Data():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT * FROM tempA ORDER BY date_created DESC LIMIT 5"
+        cursor.execute(query)
+        tempA = cursor.fetchall()
+    except mysql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempA = []
+    return jsonify({'tempA' : tempA})
 
 @app.route('/insert-data')
 def insert_data():

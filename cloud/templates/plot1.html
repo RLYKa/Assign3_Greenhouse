@@ -102,7 +102,7 @@
           // Function to fetch latest data and update the table
           function updateTable() {
         console.log('updateTable called');
-        fetch('/temp_data1')
+        fetch('/temp_data_plot1')
         .then(response=> response.json())
         .then(data=> {
             let table = document.querySelector('table');
