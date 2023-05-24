@@ -137,7 +137,7 @@
                 <td>${tempA[2]}</td>
                 <td>${tempA[4]}</td>
             `;
-            tbody.appendChild(tr);
+            tbody.insertBefore(tr, tbody.firstChild);
             });
             console.log(data.tempA);
 
