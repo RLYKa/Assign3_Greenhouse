@@ -66,55 +66,81 @@
   <!-- Light Section -->
   <div class="section">
     <h2>Light</h2>
-    <p>Current status: {{ light_status }}</p>
-    <button class="btn btn-primary" id="light_toggle">Turn {{ light_toggle_text }}</button>
-    <p>Hours lights have been on: {{ light_hours_on }}</p>
+    <p>Current status: {{ light_status}}</p>
+    <button class="btn btn-primary" id="light_toggle">Turn {{ light_toggle_text}}</button>
+    <p>Hours lights have been on: {{ light_hours_on}}</p>
   </div>
 
   <!-- Water Section -->
   <script>
         function sendPumpAction(action) {
-          fetch(action)
-            .then(response => response.json())
-            .then(data => {
-              if (data.status === "success") {
-                console.log("Action successful");
-                // handle successful response
-              } else {
-                console.error("Error:", data.message);
-                // handle error response
-              }
-            })
-            .catch(error => {
-              console.error(error);
-              // handle fetch error
-            });
+          fetch('/pump_action', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=' + encodeURIComponent(action)
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              console.log('Action successful');
+              // handle successful response
+            } else {
+              console.error('Error:', data.message);
+              // handle error response
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            // handle fetch error
+          });
         }
+
         
         
       function sendNewPumpThres() {
-        var NewThres = document.getElementById("water_threshold_input").value;
-        sendAction('/thres1 = '+ NewThres);
-        console.log('/thres1 = '+ NewThres);
+        var newThreshold = document.getElementById('water_threshold_input').value;
+        fetch('/set_threshold', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'new_threshold=' + encodeURIComponent(newThreshold)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log('Threshold set successfully');
+            // handle successful response
+          } else {
+            console.error('Error:', data.message);
+            // handle error response
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // handle fetch error
+        });
       }
+
       
       
     </script>
-
   <div class="section">
     <h2>Water</h2>
     <button class="btn btn-primary" onclick = "sendPumpAction('/PumpTrigger = 1')" id="water_pump">Pump Water Now</button>
     <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump1_Pause = 1')" id="water_pause">Pause</button>
     <button class="btn btn-secondary" onclick = "sendPumpAction('/Pump1_Pause = 0')" id="water_resume">Resume</button>
     <div class="input-group mb-3">
-      <p>Current Moisture Level: {{ moisture_level }}</p>
       <input type="number" class="form-control" id="water_threshold_input" placeholder="Threshold Percentage (Current: {{ moisture_threshold }})">
       <div class="input-group-append">
         <button class="btn btn-primary" onclick = "sendNewPumpThres()" id="water_threshold_btn">Set Threshold</button>
+         
       </div>
+      <div><p>Current Moisture Level: {{ moisture_level }}</p></div>
     </div>
   </div>
-
   <!-- Temperature Section -->
   <script>
     // Temperature section (Gordon Part)
