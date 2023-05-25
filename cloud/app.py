@@ -613,6 +613,20 @@ def getTemp_Data_plot1():
         tempA = []
     return jsonify({'tempA' : tempA})
 
+# data table in plot 2
+@app.route('/temp_data_plot2')
+def getTemp_Data_plot2():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT * FROM tempB ORDER BY date_created DESC LIMIT 5"
+        cursor.execute(query)
+        tempA = cursor.fetchall()
+    except mysql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempA = []
+    return jsonify({'tempB' : tempB})
+
+
 # data table in plot 1
 @app.route('/Aircontrol', methods=['POST'])
 def Aircontrol():

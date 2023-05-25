@@ -128,7 +128,7 @@
           // Function to fetch latest data and update the table
         function updateTable() {
         console.log('updateTable called');
-        fetch('/temp_data_plot1')
+        fetch('/temp_data_plot2')
         .then(response=> response.json())
         .then(data=> {
             let table = document.querySelector('table');
@@ -137,17 +137,17 @@
 
             // Replace the current table rows with the latest data
             tbody.innerHTML = '';
-            data.tempA.forEach(tempA=> {
+            data.tempB.forEach(tempB=> {
             let tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${tempA[0]}</td>
-                <td>${tempA[1]}</td>
-                <td>${tempA[2]}</td>
-                <td>${tempA[4]}</td>
+                <td>${tempB[0]}</td>
+                <td>${tempB[1]}</td>
+                <td>${tempB[2]}</td>
+                <td>${tempB[4]}</td>
             `;
             tbody.appendChild(tr);
             });
-            console.log(data.tempA);
+            console.log(data.tempB);
 
             // Update the warning message if necessary
             let warning = document.querySelector('.alert-warning');
@@ -165,7 +165,7 @@
     updateTable();
     setInterval(updateTable, 10000);
       function insertData() {
-              fetch('/insert-data')
+              fetch('/insert-data?plot=2')
               .then(response => response.json())
               .then(data => {
                 if (data.status === "success") {
@@ -193,12 +193,12 @@
           </tr>
       </thead>
       <tbody>
-          {% for tempA in tempA %}
+          {% for tempB in tempB %}
           <tr>
-              <td>{{ tempA.ID }}</td>
-              <td>{{ tempA.temperature }}</td>
-              <td>{{ tempA.humidity }}</td>
-              <td>{{ tempA.date_created }}</td>
+              <td>{{ tempB.ID }}</td>
+              <td>{{ tempB.temperature }}</td>
+              <td>{{ tempB.humidity }}</td>
+              <td>{{ tempB.date_created }}</td>
           </tr>
           {% endfor %}
       </tbody>
