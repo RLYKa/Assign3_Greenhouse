@@ -135,11 +135,11 @@ def on_message(client, userdata, msg):
         # print("nodes/th data: " + payload)
         cursor = mydb.cursor()
         tableName = 'tempA'
-        if data['plot'] == '1':  
+        if data['plot'] == 'A':  
             tableName = 'tempA'
-        elif data['plot'] == '2': 
+        elif data['plot'] == 'B': 
             tableName = 'tempB'
-        elif data['plot'] == '3': 
+        elif data['plot'] == 'C': 
             tableName = 'tempC'  
 
         print(tableName)
