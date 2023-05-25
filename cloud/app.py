@@ -620,10 +620,10 @@ def getTemp_Data_plot2():
         cursor = mydb.cursor()
         query = "SELECT * FROM tempB ORDER BY date_created DESC LIMIT 5"
         cursor.execute(query)
-        tempA = cursor.fetchall()
+        tempB = cursor.fetchall()
     except mysql.connector.Error as error:
         print("Failed to retrieve data from MySQL: {}".format(error))
-        tempA = []
+        tempB = []
     return jsonify({'tempB' : tempB})
 
 
