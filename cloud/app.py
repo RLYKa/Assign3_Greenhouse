@@ -132,7 +132,7 @@ def on_message(client, userdata, msg):
 
     if topic == "nodes/th":
         data = json.loads(payload)
-        print(data)
+        #print(data)
         cursor = mydb.cursor()
         tableName = 'tempA'
         if data['plot'] == 'A':  
