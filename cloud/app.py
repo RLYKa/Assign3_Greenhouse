@@ -601,6 +601,19 @@ def getTemp_Data2():
         tempB = []
     return jsonify({'tempB' : tempB})
 
+# Plot 3 data visualization
+@app.route('/temp_data3')
+def getTemp_Data3():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT * FROM tempC ORDER BY date_created DESC LIMIT 10"
+        cursor.execute(query)
+        tempC = cursor.fetchall()
+    except mysql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempC = []
+    return jsonify({'tempC' : tempC})
+
 # data table in plot 1
 @app.route('/temp_data_plot1')
 def getTemp_Data_plot1():
@@ -627,6 +640,18 @@ def getTemp_Data_plot2():
         tempB = []
     return jsonify({'tempB' : tempB})
 
+# data table in plot 3
+@app.route('/temp_data_plot3')
+def getTemp_Data_plot3():
+    try:
+        cursor = mydb.cursor()
+        query = "SELECT * FROM tempC ORDER BY date_created DESC LIMIT 5"
+        cursor.execute(query)
+        tempC = cursor.fetchall()
+    except mysql.connector.Error as error:
+        print("Failed to retrieve data from MySQL: {}".format(error))
+        tempC = []
+    return jsonify({'tempC' : tempC})
 
 # data table in plot 1
 @app.route('/Aircontrol', methods=['POST'])
@@ -672,6 +697,18 @@ def update_checklist2():
     message = "Checklist updated successfully"
     #return "Checklist updated successfully"
     return render_template('plot2.html', message=message)
+
+# update the checklist in plot 3
+@app.route('/update_checklist3', methods=['POST'])
+def update_checklist3():
+    new_value = float(request.form.get('new_value'))
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE tempC SET checklist = %s", (new_value,))
+    mydb.commit()
+    cursor.close()
+    message = "Checklist updated successfully"
+    #return "Checklist updated successfully"
+    return render_template('plot3.html', message=message)
 
 # inset data in the plot 1
 @app.route('/insert-data')
