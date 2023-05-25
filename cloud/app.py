@@ -144,8 +144,9 @@ def on_message(client, userdata, msg):
 
         sql = "INSERT INTO " + tableName + " (temperature, humidity) VALUES (%s, %s)"
         val = (data['temp'], data['humd'])
+        #val = json.dumps(val)
         cursor.execute(sql, val)
-        print("Sql value: " + val)  
+        print("Sql value: " + json.dumps(val))  
         mydb.commit()
     
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
