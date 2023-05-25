@@ -140,8 +140,9 @@ def on_message(client, userdata, msg):
         elif data['plot'] == '2': 
             tableName = 'tempB'
         elif data['plot'] == '3': 
-            tableName = 'tempC'     
+            tableName = 'tempC'  
 
+        print(tableName)
         sql = "INSERT INTO " + tableName + " (temperature, humidity) VALUES (%s, %s)"
         val = (data['temp'], data['humd'])
         #val = json.dumps(val)
