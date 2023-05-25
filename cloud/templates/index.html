@@ -7,6 +7,49 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Add some basic styles -->
+    <script>
+      function updateTable() {
+   $.ajax({
+       url: "/get_status",
+       type: "GET",
+       success: function(data) {
+           data = data.split(',');
+
+           // Hardcoded plot IDs
+           var plot1ID = "Plot 1";
+           var plot2ID = "Plot 2";
+           var plot3ID = "Plot 3";
+
+     var moisture1 = ((data[11] - 1024) / -1024 * 100).toFixed(2);
+           var moisture2 = ((data[12] - 1024) / -1024 * 100).toFixed(2);
+           var moisture3 = ((data[13] - 1024) / -1024 * 100).toFixed(2);
+
+
+           document.getElementById('plot1_id').textContent = plot1ID;
+     document.getElementById('plot1_light_status').textContent = data[0] === "1" ? "On" : "Off";
+           document.getElementById('plot1_threshold').textContent = data[1];
+           document.getElementById('plot1_light_hours').textContent = data[8];
+     document.getElementById('plot1_moisture').textContent = moisture1;
+
+           document.getElementById('plot2_id').textContent = plot2ID;
+           document.getElementById('plot2_light_status').textContent = data[2]=== "1" ? "On" : "Off";
+           document.getElementById('plot2_threshold').textContent = data[3];
+     document.getElementById('plot2_light_hours').textContent = data[9];
+     document.getElementById('plot2_moisture').textContent = moisture2;
+
+           document.getElementById('plot3_id').textContent = plot3ID;
+           document.getElementById('plot3_light_status').textContent = data[4]=== "1" ? "On" : "Off";
+           document.getElementById('plot3_threshold').textContent = data[5];
+           document.getElementById('plot3_light_hours').textContent = data[10];
+     document.getElementById('plot3_moisture').textContent = moisture3;
+
+       },
+       error: function() {
+           console.log('Error occurred while fetching data.');
+       }
+   });
+}
+   </script>
     <style>
         table {
             margin: 20px 0;
@@ -98,50 +141,25 @@
         </table>
           
         <button type="button" class="btn btn-primary" onclick="updateTable()" id="check-btn">Check</button>
+        <button type="button" class="btn btn-primary" onclick="updateTableZ()" id="check-btn">Refresh Page</button>
     </div>
-
     <script>
-       function updateTable() {
-    $.ajax({
-        url: "/get_status",
-        type: "GET",
-        success: function(data) {
-            data = data.split(',');
-
-            // Hardcoded plot IDs
-            var plot1ID = "Plot 1";
-            var plot2ID = "Plot 2";
-            var plot3ID = "Plot 3";
-
-			var moisture1 = ((data[11] - 1024) / -1024 * 100).toFixed(2);
-            var moisture2 = ((data[12] - 1024) / -1024 * 100).toFixed(2);
-            var moisture3 = ((data[13] - 1024) / -1024 * 100).toFixed(2);
-
-
-            document.getElementById('plot1_id').textContent = plot1ID;
-			document.getElementById('plot1_light_status').textContent = data[1] === "1" ? "On" : "Off";
-            document.getElementById('plot1_threshold').textContent = data[2];
-            document.getElementById('plot1_light_hours').textContent = data[8];
-			document.getElementById('plot1_moisture').textContent = moisture1;
-
-            document.getElementById('plot2_id').textContent = plot2ID;
-            document.getElementById('plot2_light_status').textContent = data[3]=== "1" ? "On" : "Off";
-            document.getElementById('plot2_threshold').textContent = data[4];
-			document.getElementById('plot2_light_hours').textContent = data[9];
-			document.getElementById('plot2_moisture').textContent = moisture2;
-
-            document.getElementById('plot3_id').textContent = plot3ID;
-            document.getElementById('plot3_light_status').textContent = data[5]=== "1" ? "On" : "Off";
-            document.getElementById('plot3_threshold').textContent = data[6];
-            document.getElementById('plot3_light_hours').textContent = data[10];
-			document.getElementById('plot3_moisture').textContent = moisture3;
-
-        },
-        error: function() {
-            console.log('Error occurred while fetching data.');
-        }
-    });
-}
-    </script>
+      function updateTableZ() {
+     $.ajax({
+         url: "/get_status",
+         type: "GET",
+         success: function(data) {
+        
+           setTimeout(function() {
+             location.reload();
+           }, 3000);
+  
+         },
+         error: function() {
+             console.log('Error occurred while fetching data.');
+         }
+     });
+  }
+   </script>
 </body>
 </html>
