@@ -661,6 +661,18 @@ def update_checklist():
     #return "Checklist updated successfully"
     return render_template('plot1.html', message=message)
 
+# update the checklist in plot 2
+@app.route('/update_checklist2', methods=['POST'])
+def update_checklist2():
+    new_value = float(request.form.get('new_value'))
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE tempB SET checklist = %s", (new_value,))
+    mydb.commit()
+    cursor.close()
+    message = "Checklist updated successfully"
+    #return "Checklist updated successfully"
+    return render_template('plot2.html', message=message)
+
 # inset data in the plot 1
 @app.route('/insert-data')
 def insert_data():
