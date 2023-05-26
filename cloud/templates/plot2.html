@@ -265,17 +265,11 @@
     });
 </script>
 <script>
-  function updateTable() {
+  function updateTableZ() {
  $.ajax({
      url: "/get_status",
      type: "GET",
      success: function(data) {
-       data = data.split(',');
-
-       document.getElementById('plot1_light_status').textContent = data[0] === "1" ? "On" : "Off";
-       document.getElementById('plot1_threshold').textContent = data[1];
-       document.getElementById('plot1_light_hours').textContent = data[8];
-    
        setTimeout(function() {
          location.reload();
        }, 3000);
@@ -360,32 +354,7 @@ lightToggleBtn.addEventListener("click", function() {
 
 </script>
 
-<div class="d-flex justify-content-center">
-  <button type="button" class="btn btn-primary" onclick="updateTable()" id="check-btn">Refresh</button>
-</div>
-<script>
-    function updateTable() {
-   $.ajax({
-       url: "/get_status",
-       type: "GET",
-       success: function(data) {
-         data = data.split(',');
 
-         document.getElementById('plot1_light_status').textContent = data[0] === "1" ? "On" : "Off";
-         document.getElementById('plot1_threshold').textContent = data[1];
-         document.getElementById('plot1_light_hours').textContent = data[8];
-      
-         setTimeout(function() {
-           location.reload();
-         }, 3000);
-
-       },
-       error: function() {
-           console.log('Error occurred while fetching data.');
-       }
-   });
-}
- </script>
 
 <script>
   $(document).ready(function() {
