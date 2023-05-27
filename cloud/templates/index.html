@@ -25,10 +25,24 @@
     <div class="container">
         <h1 class="my-5">Portable Greenhouse System</h1>
 
-        <!-- Your code for warning alerts here -->
         {% if weather %}
-			<div class="alert alert-warning">{{ weather }}</div>
-		{% endif %}
+          <div class="alert alert-warning">
+              {{ weather }}
+              {% if not button_clicked %}
+                The recommended threshold for water pump: {{ threshold }}
+              {% endif %}
+        
+          </div>
+        {% endif %}
+        
+
+        {% if not button_clicked %}
+            <form action="{{ url_for('change_threshold') }}" method="POST">
+                <input type="hidden" name="humidity" value="{{ humidity }}">
+                <button class='btn btn-primary' type="submit">Change Threshold for All Water Pumps</button>
+            </form>
+        {% endif %}
+        
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">Overview</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

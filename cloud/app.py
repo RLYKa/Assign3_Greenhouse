@@ -4,7 +4,8 @@ import paho.mqtt.client as paho
 import json
 import mysql.connector
 import pytz
-from datetime import datetime
+from datetime import datetime, date
+
 
 import subprocess
 import time
@@ -207,27 +208,101 @@ mqtt_client.on_subscribe = on_subscribe
 mqtt_client.on_message = on_message
 mqtt_client.on_publish = on_publish
 
+# Function to determine the threshold based on humidity
+def get_thresholdZ(humidity):
+  if humidity > 80:
+      return 650
+  elif 50 <= humidity <= 80:
+      return 750
+  else:
+      return 850
+
+    
+# Function to check if the button has been clicked today
+def is_button_clicked_today():
+    try:
+        
+
+        # Create a cursor object to execute SQL queries
+        cursor = mydb.cursor()
+
+        # Retrieve the last clicked date from the table
+        query = "SELECT clicked_date FROM last_clicked_date"
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        if result:
+            last_clicked_date_str = result[0].strftime("%Y-%m-%d")
+            last_clicked_date = datetime.strptime(last_clicked_date_str, "%Y-%m-%d").date()
+        else:
+            # If no date is found, return False
+            return False
+
+        cursor.close()
+    except Exception as e:
+        print(e)
+        return False
+
+    return last_clicked_date == date.today()
+
 
 @app.route('/')
 def index():
-    #Retrieve the current temperature, humidity, and weather status from the database
+    # Retrieve the current temperature, humidity, and weather status from the database
     cursor = mydb.cursor()
-    query = "SELECT temperature, humidity, status FROM weather_log LIMIT 1"
+    query = "SELECT temperature, REPLACE(humidity, '%', ''), status FROM weather_log LIMIT 1"
     cursor.execute(query)
     result = cursor.fetchone()
     cursor.close()
-
+    print (result)
     if result:
         temperature, humidity, status = result
+        print (str(humidity))
         # Format the temperature, humidity, and status as desired for the message
-        message = f"Current Temperature: {temperature}°C, Humidity: {humidity}, Weather Status: {status}"
-        # Check if the same message has been shown today
-        # You can use a variable or database to store the last shown message date and compare it with the current date
+        weather_message = f"Current Temperature: {temperature}°C, Humidity: {humidity}%, Weather Status: {status}."
+        # Check if the button has been clicked today
+        button_clicked_today = is_button_clicked_today()
+        try:
+            threshold = get_thresholdZ(int(humidity))
+            threshold = round(((threshold - 1024) / -1024), 2) * 100
+            threshold = str(threshold)
+            print(threshold)
+        except Exception as e:
+            print("An error occurred while calculating the threshold:", str(e))
+            threshold = ""
+        
+        # Render the template with the message and button variables
+        return render_template('index.html', weather=weather_message,threshold=threshold, button_clicked=button_clicked_today,  humidity=humidity)
 
-        # Render the template with the message variable
-        return render_template('index.html', weather=message)
     return render_template('index.html')
 
+
+@app.route('/change_threshold', methods=['POST'])
+def change_threshold():
+    humidity = request.form['humidity']  # Get the humidity value from the form
+    threshold = get_thresholdZ(int(humidity))  # Determine the threshold value based on humidity
+    try:
+        
+
+        # Create a cursor object to execute SQL queries
+        cursor = mydb.cursor()
+
+        # Update the last clicked date in the table
+        query = "UPDATE last_clicked_date SET clicked_date = %s"
+        cursor.execute(query, (date.today(),))
+        mydb.commit()
+
+        cursor.close()
+    except Exception as e:
+        print(e)
+    
+    mqtt_client.publish("nodes/water", payload='thres1 = '+str(threshold))
+    mqtt_client.publish("nodes/water", payload='thres2 = '+str(threshold))
+    mqtt_client.publish("nodes/water", payload='thres3 = '+str(threshold))
+    # Redirect back to the index page
+    time.sleep(3)
+    return index()
+    
 # Route to fetch the past 5 days of data from node_hour table
 @app.route('/get_hour_data')
 def get_hour_data():
