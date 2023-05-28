@@ -117,6 +117,8 @@ def on_connect(client, userdata, flags, rc, properties=None):
     mqtt_client.subscribe("nodes/th")
     #until here
 
+    send_start_stream_message()
+
 
 def on_publish(client, userdata, mid, properties=None):
     print("mid: " + str(mid))
@@ -202,6 +204,14 @@ def on_message(client, userdata, msg):
         cursor = mydb.cursor()
         cursor.execute(query, values)
         mydb.commit()     
+
+# Function to send a start stream message
+def send_start_stream_message():
+    mqtt_client.publish("nodes/startStream", "start_streaming")
+
+# Function to send a stop stream message
+def send_stop_stream_message():
+    mqtt_client.publish("nodes/startStream", "stop_streaming")
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_subscribe = on_subscribe
@@ -433,12 +443,13 @@ def set_threshold():
     new_threshold = data['new_threshold']
 
     # Prepare the MQTT message
-    command = f"T{ldr_index}_{new_threshold}"
+    command = f"setThreshold_{ldr_index}_{new_threshold}"
     try:
-        mqtt_client.publish(TOPIC_LDR, payload=command)
+        mqtt_client.publish(TOPIC_THRESHOLD, payload=command)
         return "Threshold message sent successfully"
     except Exception as e:
         return f"Failed to send threshold message: {str(e)}", 500
+
 
 
 @app.route('/led', methods=['POST'])

@@ -72,7 +72,7 @@
     <p>Hours lights have been on: <span id="plot1_light_hours"></span></p>
     <label for="duration_input">Duration (in seconds):</label>
     <input type="number" id="duration_input" min="1" value="10">
-    <button class="btn btn-primary" id="light_toggle">Toggle</button>
+    <button class="btn btn-primary" id="light_toggle">Toggle Light</button>
     <button class="btn btn-secondary" id="light_refresh">Refresh</button>
     <br>
     <label for="threshold_input">New Threshold:</label>
@@ -325,7 +325,7 @@
       return;
     }
     const payload = {
-      led_num: 1,  // Update with the appropriate LED number
+      led_num: 0,  // Update with the appropriate LED number
       duration: duration,
       action: action
     };
@@ -360,7 +360,7 @@ $(document).ready(function() {
   // Update Threshold button click event
   $('#threshold_update').click(function() {
     // Hardcoded LDR index
-    var ldrIndex = 1;  // Replace with the desired LDR index
+    var ldrIndex = 0;  // Replace with the desired LDR index
     
     // Get the new threshold value
     var newThreshold = $('#threshold_input').val();

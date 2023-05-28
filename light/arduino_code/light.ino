@@ -1,12 +1,13 @@
 int ldrPins[] = {A0, A1, A2};
 int ledPins[] = {6, 5, 4};
 int ldrValues[3] = {0, 0, 0};
-int thresholds[3] = {100, 100, 100};  // default threshold values
+int thresholds[3] = {120, 180, 140};  // default threshold values
 bool ledStates[3] = {LOW, LOW, LOW};
 
 // LED control
 unsigned long ledTurnOnTimes[3] = {0, 0, 0};
 int ledDurations[3] = {0, 0, 0};
+bool forceOff[3] = {false, false, false};  // new variable to track whether each LED should be forced off
 
 void setup() {
   Serial.begin(9600);
@@ -19,14 +20,23 @@ void loop() {
   // Read command from Raspberry Pi
   while (Serial.available()) {
     String command = Serial.readStringUntil('\n');
-    if (command.substring(0, 1) == "T") {  // Change threshold
-      int index = command.substring(1, 2).toInt();
-      int newThreshold = command.substring(3).toInt();
-      thresholds[index] = newThreshold;
-    } else if (command.substring(0, 1) == "L") {  // Control LED
-      int index = command.substring(1, 2).toInt();
-      ledDurations[index] = command.substring(3).toInt();
-      ledTurnOnTimes[index] = millis();
+    if (command.startsWith("setThreshold")) {  // Change threshold
+        int index = command.substring(13, 14).toInt();
+        int newThreshold = command.substring(15).toInt();
+        thresholds[index] = newThreshold;
+    } else if (command.startsWith("led_on")) {  // Turn on LED
+        int index = command.substring(7, 8).toInt();
+        int duration = command.substring(9).toInt();
+        digitalWrite(ledPins[index], HIGH);
+        ledStates[index] = HIGH;
+        ledTurnOnTimes[index] = millis();
+        ledDurations[index] = duration;
+        forceOff[index] = false;  // reset the force off flag when turning on the LED
+    } else if (command.startsWith("led_off")) {  // Turn off LED
+        int index = command.substring(8, 9).toInt();
+        digitalWrite(ledPins[index], LOW);
+        ledStates[index] = LOW;
+        forceOff[index] = true;  // set the force off flag when turning off the LED
     } else if (command == "getStatus") {
       for (int i = 0; i < 3; i++) {
         Serial.print(ledStates[i]);
@@ -49,10 +59,10 @@ void loop() {
       digitalWrite(ledPins[i], HIGH);
       ledStates[i] = HIGH;
     } else {
-      if (ldrValues[i] > thresholds[i]) {
+      if (ldrValues[i] > thresholds[i] && !forceOff[i]) {
         digitalWrite(ledPins[i], LOW);
         ledStates[i] = LOW;
-      } else {
+      } else if (!forceOff[i]) {
         digitalWrite(ledPins[i], HIGH);
         ledStates[i] = HIGH;
       }

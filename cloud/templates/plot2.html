@@ -323,7 +323,7 @@ lightToggleBtn.addEventListener("click", function() {
     return;
   }
   const payload = {
-    led_num: 2,  // Update with the appropriate LED number
+    led_num: 1,  // Update with the appropriate LED number
     duration: duration,
     action: action
   };
@@ -361,7 +361,7 @@ lightToggleBtn.addEventListener("click", function() {
     // Update Threshold button click event
     $('#threshold_update').click(function() {
       // Hardcoded LDR index
-      var ldrIndex = 2;  // Replace with the desired LDR index
+      var ldrIndex = 1;  // Replace with the desired LDR index
       
       // Get the new threshold value
       var newThreshold = $('#threshold_input').val();
