@@ -793,10 +793,10 @@ def update_checklist():
 
     # Publish MQTT message to control Arduino
     mqtt_client.publish('nodes/control', payload=str(new_value),)
-    mqtt_client.publish('nodes/th/set3', payload=json.dumps({
-        'status': data.get('direction'), 
-        'speed': data.get('speed')
-    }))
+    #mqtt_client.publish('nodes/th/set3', payload=json.dumps({
+    #    'status': data.get('direction'), 
+    #    'speed': data.get('speed')
+    #}))
     
     return render_template('plot1.html', message=message)
 
