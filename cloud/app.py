@@ -117,9 +117,6 @@ def on_connect(client, userdata, flags, rc, properties=None):
     mqtt_client.subscribe("nodes/th")
     #until here
 
-    send_start_stream_message()
-
-
 def on_publish(client, userdata, mid, properties=None):
     print("mid: " + str(mid))
 
@@ -204,14 +201,6 @@ def on_message(client, userdata, msg):
         cursor = mydb.cursor()
         cursor.execute(query, values)
         mydb.commit()     
-
-# Function to send a start stream message
-def send_start_stream_message():
-    mqtt_client.publish("nodes/startStream", "start_streaming")
-
-# Function to send a stop stream message
-def send_stop_stream_message():
-    mqtt_client.publish("nodes/startStream", "stop_streaming")
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_subscribe = on_subscribe
@@ -307,10 +296,13 @@ def change_threshold():
         print(e)
     
     mqtt_client.publish("nodes/water", payload='thres1 = '+str(threshold))
+    time.sleep(2)
     mqtt_client.publish("nodes/water", payload='thres2 = '+str(threshold))
+    time.sleep(2)
     mqtt_client.publish("nodes/water", payload='thres3 = '+str(threshold))
+    time.sleep(2)
     # Redirect back to the index page
-    time.sleep(3)
+    
     return index()
     
 # Route to fetch the past 5 days of data from node_hour table
@@ -748,7 +740,7 @@ def Aircontrol():
         'speed': data.get('speed')
     }))
     time.sleep(1)
-    return 'OK', 200
+    return render_template('plot1.html')
 
 @app.route('/Aircontrol2', methods=['POST'])
 def Aircontrol2():
@@ -758,7 +750,7 @@ def Aircontrol2():
         'speed': data.get('speed')
     }))
     time.sleep(1)
-    return 'OK', 200
+    return render_template('plot2.html')
 
 @app.route('/Aircontrol3', methods=['POST'])
 def Aircontrol3():
@@ -768,7 +760,7 @@ def Aircontrol3():
         'speed': data.get('speed')
     }))
     time.sleep(1)
-    return 'OK', 200
+    return render_template('plot3.html')
 
 # update the checklist in plot 1
 #@app.route('/update_checklist', methods=['POST'])
