@@ -802,6 +802,9 @@ def update_checklist2():
     mydb.commit()
     cursor.close()
     message = "Checklist updated successfully"
+
+    # Publish MQTT message to control Arduino
+    mqtt_client.publish('nodes/control2', payload=str(new_value),)
     #return "Checklist updated successfully"
     return render_template('plot2.html', message=message)
 
@@ -815,6 +818,9 @@ def update_checklist3():
     cursor.close()
     message = "Checklist updated successfully"
     #return "Checklist updated successfully"
+
+    # Publish MQTT message to control Arduino
+    mqtt_client.publish('nodes/control3', payload=str(new_value),)
     return render_template('plot3.html', message=message)
 
 # inset data in the plot 1
