@@ -771,6 +771,17 @@ def Aircontrol3():
     return 'OK', 200
 
 # update the checklist in plot 1
+#@app.route('/update_checklist', methods=['POST'])
+#def update_checklist():
+#    new_value = float(request.form.get('new_value'))
+#    cursor = mydb.cursor()
+#    cursor.execute("UPDATE tempA SET checklist = %s", (new_value,))
+#    mydb.commit()
+#    cursor.close()
+#    message = "Checklist updated successfully"
+#    #return "Checklist updated successfully"
+#    return render_template('plot1.html', message=message)
+
 @app.route('/update_checklist', methods=['POST'])
 def update_checklist():
     new_value = float(request.form.get('new_value'))
@@ -779,8 +790,16 @@ def update_checklist():
     mydb.commit()
     cursor.close()
     message = "Checklist updated successfully"
-    #return "Checklist updated successfully"
+
+    # Publish MQTT message to control Arduino
+    mqtt_client.publish('nodes/control', payload=str(new_value),)
+    mqtt_client.publish('nodes/th/set3', payload=json.dumps({
+        'status': data.get('direction'), 
+        'speed': data.get('speed')
+    }))
+    
     return render_template('plot1.html', message=message)
+
 
 # update the checklist in plot 2
 @app.route('/update_checklist2', methods=['POST'])
